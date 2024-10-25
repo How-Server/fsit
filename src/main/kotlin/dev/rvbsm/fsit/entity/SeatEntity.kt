@@ -1,6 +1,6 @@
 package dev.rvbsm.fsit.entity
 
-import dev.rvbsm.fsit.networking.clientVelocity
+import dev.rvbsm.fsit.networking.realVelocity
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.util.math.plus
 import dev.rvbsm.fsit.util.math.times
@@ -37,7 +37,7 @@ class SeatEntity(private val player: ServerPlayerEntity, pos: Vec3d) :
         customName = "FSit_SeatEntity".literal()
 
         if (config.sitting.behaviour.shouldMove) {
-            velocity = player.clientVelocity * velocityMultiplier.toDouble()
+            velocity = player.realVelocity * velocityMultiplier.toDouble()
         }
     }
 

@@ -3,7 +3,7 @@ package dev.rvbsm.fsit.networking
 import dev.rvbsm.fsit.api.entity.ConfigurableEntity
 import dev.rvbsm.fsit.api.entity.CrawlableEntity
 import dev.rvbsm.fsit.api.entity.PoseableEntity
-import dev.rvbsm.fsit.api.network.ServerPlayerClientVelocity
+import dev.rvbsm.fsit.api.network.ServerPlayerVelocity
 import dev.rvbsm.fsit.entity.CrawlEntity
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.networking.payload.CustomPayload
@@ -30,4 +30,4 @@ var ServerPlayerEntity.config
     set(config) = (this as ConfigurableEntity).`fsit$setConfig`(config)
 fun ServerPlayerEntity.hasConfig() = (this as ConfigurableEntity).`fsit$hasConfig`()
 
-val ServerPlayerEntity.clientVelocity get() = (this as ServerPlayerClientVelocity).`fsit$getClientVelocity`()
+val ServerPlayerEntity.realVelocity get() = (this as ServerPlayerVelocity).`fsit$getPlayerVelocity`()

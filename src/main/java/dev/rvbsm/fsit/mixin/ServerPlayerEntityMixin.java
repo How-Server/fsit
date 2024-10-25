@@ -4,40 +4,39 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.rvbsm.fsit.FSitMod;
 import dev.rvbsm.fsit.api.entity.ConfigurableEntity;
 import dev.rvbsm.fsit.api.entity.CrawlableEntity;
-import dev.rvbsm.fsit.api.network.ServerPlayerClientVelocity;
+import dev.rvbsm.fsit.api.event.UpdatePoseCallback;
+import dev.rvbsm.fsit.api.network.ServerPlayerVelocity;
 import dev.rvbsm.fsit.config.ModConfig;
 import dev.rvbsm.fsit.entity.CrawlEntity;
 import dev.rvbsm.fsit.entity.PlayerPose;
-import dev.rvbsm.fsit.api.event.UpdatePoseCallback;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ConfigurableEntity, CrawlableEntity, ServerPlayerClientVelocity {
+public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ConfigurableEntity, CrawlableEntity, ServerPlayerVelocity {
+    @Shadow
+    public abstract void stopRiding();
+
     @Unique
     private @Nullable ModConfig config;
     @Unique
     private @Nullable CrawlEntity crawlEntity;
     @Unique
-    private Vec3d clientVelocity = Vec3d.ZERO;
-
-    protected ServerPlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
-    }
+    private @NotNull Vec3d playerVelocity = Vec3d.ZERO;
 
     @Inject(method = "playerTick", at = @At("TAIL"))
-    private void tickCrawlingVanillaPlayer(CallbackInfo ci) {
+    private void tickPosing(CallbackInfo ci) {
         if (this.fsit$isInPose()) {
             if (this.getAbilities().flying || this.isSneaking()) {
                 this.fsit$resetPose();
@@ -72,12 +71,17 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     }
 
     @Override
-    public boolean hasPlayerRider() {
+    protected void move(MovementType movementType, Vec3d movement, CallbackInfo ci, Vec3d velocity) {
+        this.playerVelocity = velocity;
+    }
+
+    @Override
+    public boolean hasPlayerRider(boolean original) {
         return false;
     }
 
     @Override
-    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
+    public Vec3d updatePassengerForDismount(Vec3d original, LivingEntity passenger) {
         return this.getPos();
     }
 
@@ -126,12 +130,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     }
 
     @Override
-    public void fsit$setClientVelocity(@NotNull Vec3d velocity) {
-        this.clientVelocity = velocity;
-    }
-
-    @Override
-    public @NotNull Vec3d fsit$getClientVelocity() {
-        return this.clientVelocity;
+    public @NotNull Vec3d fsit$getPlayerVelocity() {
+        return this.playerVelocity;
     }
 }
