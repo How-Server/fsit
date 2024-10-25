@@ -2,21 +2,15 @@ package dev.rvbsm.fsit.entity
 
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.realVelocity
-import dev.rvbsm.fsit.util.math.plus
-import dev.rvbsm.fsit.util.math.times
 import dev.rvbsm.fsit.util.text.literal
 import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.entity.Dismounting
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityPose
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3i
 
 class SeatEntity(private val player: ServerPlayerEntity, pos: Vec3d) :
     ArmorStandEntity(player.world, pos.x, pos.y, pos.z) {
@@ -65,33 +59,7 @@ class SeatEntity(private val player: ServerPlayerEntity, pos: Vec3d) :
     //? if >=1.20.5
     /*override fun getPassengerAttachmentPos(passenger: net.minecraft.entity.Entity, dimensions: EntityDimensions, scaleFactor: Float): Vec3d = Vec3d.ZERO*/
 
-    /**
-     * @see net.minecraft.entity.vehicle.AbstractMinecartEntity.updatePassengerForDismount
-     * @see net.minecraft.entity.vehicle.BoatEntity.updatePassengerForDismount
-     */
-    override fun updatePassengerForDismount(passenger: LivingEntity): Vec3d {
-        val dismountOffsets = arrayOf(
-            intArrayOf(0, 0),
-            *Dismounting.getDismountOffsets(Direction.fromRotation(passenger.yaw.toDouble())),
-        ).map { Vec3i(it.first(), 0, it.last()) }
-
-        for (dismountOffset in dismountOffsets) {
-            val dismountBlockPos = BlockPos.ofFloored(pos + dismountOffset)
-            val dismountHeight = world.getDismountHeight(dismountBlockPos)
-
-            for (passengerPose in passenger.poses) {
-                if (Dismounting.canDismountInBlock(dismountHeight)) {
-                    val dismountPos = Vec3d.ofCenter(dismountBlockPos, dismountHeight)
-                    if (Dismounting.canPlaceEntityAt(world, dismountPos, passenger, passengerPose)) {
-                        passenger.pose = passengerPose
-                        return dismountPos
-                    }
-                }
-            }
-        }
-
-        return pos
-    }
+    override fun updatePassengerForDismount(passenger: LivingEntity) = getDismountPosition(this, passenger)
 
     override fun getPistonBehavior() = PistonBehavior.NORMAL
     override fun hasPlayerRider() = false

@@ -8,6 +8,7 @@ import dev.rvbsm.fsit.api.event.UpdatePoseCallback;
 import dev.rvbsm.fsit.api.network.ServerPlayerVelocity;
 import dev.rvbsm.fsit.config.ModConfig;
 import dev.rvbsm.fsit.entity.CrawlEntity;
+import dev.rvbsm.fsit.entity.DismountingKt;
 import dev.rvbsm.fsit.entity.PlayerPose;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -82,7 +83,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
 
     @Override
     public Vec3d updatePassengerForDismount(Vec3d original, LivingEntity passenger) {
-        return this.getPos();
+        return DismountingKt.getDismountPosition((ServerPlayerEntity) (Object) this, passenger);
     }
 
     @Override
