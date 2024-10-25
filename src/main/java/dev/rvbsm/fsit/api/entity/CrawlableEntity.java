@@ -1,9 +1,9 @@
-package dev.rvbsm.fsit.api;
+package dev.rvbsm.fsit.api.entity;
 
 import dev.rvbsm.fsit.entity.CrawlEntity;
 import org.jetbrains.annotations.NotNull;
 
-public interface Crawlable {
+public interface CrawlableEntity {
     void fsit$startCrawling(@NotNull CrawlEntity crawlEntity);
 
     void fsit$stopCrawling();

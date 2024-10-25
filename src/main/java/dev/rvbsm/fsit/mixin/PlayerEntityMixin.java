@@ -1,6 +1,6 @@
 package dev.rvbsm.fsit.mixin;
 
-import dev.rvbsm.fsit.api.Poseable;
+import dev.rvbsm.fsit.api.entity.PoseableEntity;
 import dev.rvbsm.fsit.entity.PlayerPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin extends LivingEntity implements Poseable {
+public abstract class PlayerEntityMixin extends LivingEntity implements PoseableEntity {
     @Unique
     protected @NotNull PlayerPose pose = PlayerPose.Standing;
 

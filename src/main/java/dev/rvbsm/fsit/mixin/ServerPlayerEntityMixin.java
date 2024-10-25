@@ -2,9 +2,9 @@ package dev.rvbsm.fsit.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.rvbsm.fsit.FSitMod;
-import dev.rvbsm.fsit.api.ConfigurableEntity;
-import dev.rvbsm.fsit.api.Crawlable;
-import dev.rvbsm.fsit.api.ServerPlayerClientVelocity;
+import dev.rvbsm.fsit.api.entity.ConfigurableEntity;
+import dev.rvbsm.fsit.api.entity.CrawlableEntity;
+import dev.rvbsm.fsit.api.network.ServerPlayerClientVelocity;
 import dev.rvbsm.fsit.config.ModConfig;
 import dev.rvbsm.fsit.entity.CrawlEntity;
 import dev.rvbsm.fsit.entity.PlayerPose;
@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ConfigurableEntity, Crawlable, ServerPlayerClientVelocity {
+public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ConfigurableEntity, CrawlableEntity, ServerPlayerClientVelocity {
     @Unique
     private @Nullable ModConfig config;
     @Unique

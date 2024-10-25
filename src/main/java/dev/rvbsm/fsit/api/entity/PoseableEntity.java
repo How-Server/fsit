@@ -1,11 +1,11 @@
-package dev.rvbsm.fsit.api;
+package dev.rvbsm.fsit.api.entity;
 
 import dev.rvbsm.fsit.entity.PlayerPose;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface Poseable {
+public interface PoseableEntity {
     void fsit$setPose(@NotNull PlayerPose pose, @Nullable Vec3d pos);
 
     PlayerPose fsit$getPose();

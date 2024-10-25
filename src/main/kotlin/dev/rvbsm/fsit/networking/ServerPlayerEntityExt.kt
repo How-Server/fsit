@@ -1,9 +1,9 @@
 package dev.rvbsm.fsit.networking
 
-import dev.rvbsm.fsit.api.ConfigurableEntity
-import dev.rvbsm.fsit.api.Crawlable
-import dev.rvbsm.fsit.api.Poseable
-import dev.rvbsm.fsit.api.ServerPlayerClientVelocity
+import dev.rvbsm.fsit.api.entity.ConfigurableEntity
+import dev.rvbsm.fsit.api.entity.CrawlableEntity
+import dev.rvbsm.fsit.api.entity.PoseableEntity
+import dev.rvbsm.fsit.api.network.ServerPlayerClientVelocity
 import dev.rvbsm.fsit.entity.CrawlEntity
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.networking.payload.CustomPayload
@@ -17,13 +17,13 @@ internal fun <T> ServerPlayerEntity.trySend(payload: T, orAction: () -> Unit = {
     } else orAction()
 }
 
-fun ServerPlayerEntity.setPose(pose: PlayerPose, pos: Vec3d? = null) = (this as Poseable).`fsit$setPose`(pose, pos)
-fun ServerPlayerEntity.resetPose() = (this as Poseable).`fsit$resetPose`()
-fun ServerPlayerEntity.isInPose() = (this as Poseable).`fsit$isInPose`()
+fun ServerPlayerEntity.setPose(pose: PlayerPose, pos: Vec3d? = null) = (this as PoseableEntity).`fsit$setPose`(pose, pos)
+fun ServerPlayerEntity.resetPose() = (this as PoseableEntity).`fsit$resetPose`()
+fun ServerPlayerEntity.isInPose() = (this as PoseableEntity).`fsit$isInPose`()
 
-fun ServerPlayerEntity.setCrawl(crawlEntity: CrawlEntity) = (this as Crawlable).`fsit$startCrawling`(crawlEntity)
-fun ServerPlayerEntity.removeCrawl() = (this as Crawlable).`fsit$stopCrawling`()
-fun ServerPlayerEntity.hasCrawl() = (this as Crawlable).`fsit$isCrawling`()
+fun ServerPlayerEntity.setCrawl(crawlEntity: CrawlEntity) = (this as CrawlableEntity).`fsit$startCrawling`(crawlEntity)
+fun ServerPlayerEntity.removeCrawl() = (this as CrawlableEntity).`fsit$stopCrawling`()
+fun ServerPlayerEntity.hasCrawl() = (this as CrawlableEntity).`fsit$isCrawling`()
 
 var ServerPlayerEntity.config
     get() = (this as ConfigurableEntity).`fsit$getConfig`()

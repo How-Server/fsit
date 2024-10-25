@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.api;
+package dev.rvbsm.fsit.api.entity;
 
 import dev.rvbsm.fsit.config.ModConfig;
 import org.jetbrains.annotations.NotNull;
