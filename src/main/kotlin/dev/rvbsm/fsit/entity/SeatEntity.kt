@@ -1,7 +1,7 @@
 package dev.rvbsm.fsit.entity
 
-import dev.rvbsm.fsit.networking.realVelocity
 import dev.rvbsm.fsit.networking.config
+import dev.rvbsm.fsit.networking.realVelocity
 import dev.rvbsm.fsit.util.math.plus
 import dev.rvbsm.fsit.util.math.times
 import dev.rvbsm.fsit.util.text.literal
@@ -35,10 +35,6 @@ class SeatEntity(private val player: ServerPlayerEntity, pos: Vec3d) :
         isMarker = true
 
         customName = "FSit_SeatEntity".literal()
-
-        if (config.sitting.behaviour.shouldMove) {
-            velocity = player.realVelocity * velocityMultiplier.toDouble()
-        }
     }
 
     override fun tick() {
@@ -104,8 +100,15 @@ class SeatEntity(private val player: ServerPlayerEntity, pos: Vec3d) :
     override fun canClip() = !this.hasNoGravity()
 
     companion object {
+        private const val MIN_VELOCITY_LENGTH = 0.3
+
         fun create(player: ServerPlayerEntity, pos: Vec3d) {
             val seatEntity = SeatEntity(player, pos)
+
+            if (player.config.sitting.behaviour.shouldMove && player.realVelocity.length() >= MIN_VELOCITY_LENGTH) {
+//              // todo: applies only after some time and looks comical
+                seatEntity.velocity = player.realVelocity
+            }
 
             player.startRiding(seatEntity, true)
             player.world.spawnEntity(seatEntity)
