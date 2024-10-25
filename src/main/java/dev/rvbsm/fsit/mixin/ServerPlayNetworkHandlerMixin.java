@@ -2,10 +2,10 @@ package dev.rvbsm.fsit.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import dev.rvbsm.fsit.api.ServerPlayerClientVelocity;
-import dev.rvbsm.fsit.event.ClientCommandCallback;
-import dev.rvbsm.fsit.event.PassedUseBlockCallback;
-import dev.rvbsm.fsit.event.PassedUseEntityCallback;
+import dev.rvbsm.fsit.api.network.ServerPlayerClientVelocity;
+import dev.rvbsm.fsit.api.event.ClientCommandCallback;
+import dev.rvbsm.fsit.api.event.PassedUseBlockCallback;
+import dev.rvbsm.fsit.api.event.PassedUseEntityCallback;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;

@@ -1,0 +1,18 @@
+package dev.rvbsm.fsit.api.event;
+
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.NotNull;
+
+@FunctionalInterface
+public interface ClientCommandCallback {
+    Event<ClientCommandCallback> EVENT = EventFactory.createArrayBacked(ClientCommandCallback.class, (listeners) -> (player, mode) -> {
+        for (ClientCommandCallback listener : listeners) {
+            listener.onClientMode(player, mode);
+        }
+    });
+
+    void onClientMode(@NotNull ServerPlayerEntity player, @NotNull ClientCommandC2SPacket.Mode mode);
+}

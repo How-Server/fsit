@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.event
 
+import dev.rvbsm.fsit.api.event.UpdatePoseCallback
 import dev.rvbsm.fsit.entity.CrawlEntity
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.entity.SeatEntity

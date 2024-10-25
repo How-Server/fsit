@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.event
 
+import dev.rvbsm.fsit.api.event.PassedUseEntityCallback
 import dev.rvbsm.fsit.entity.RideEntity
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload

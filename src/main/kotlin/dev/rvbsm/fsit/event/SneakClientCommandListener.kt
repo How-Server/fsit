@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.event
 
+import dev.rvbsm.fsit.api.event.ClientCommandCallback
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.entity.RideEntity
 import dev.rvbsm.fsit.networking.config

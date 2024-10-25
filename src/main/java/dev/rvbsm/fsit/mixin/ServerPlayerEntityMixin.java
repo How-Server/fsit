@@ -8,7 +8,7 @@ import dev.rvbsm.fsit.api.network.ServerPlayerClientVelocity;
 import dev.rvbsm.fsit.config.ModConfig;
 import dev.rvbsm.fsit.entity.CrawlEntity;
 import dev.rvbsm.fsit.entity.PlayerPose;
-import dev.rvbsm.fsit.event.UpdatePoseCallback;
+import dev.rvbsm.fsit.api.event.UpdatePoseCallback;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -104,7 +104,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     public void fsit$setPose(@NotNull PlayerPose pose, @Nullable Vec3d pos) {
         super.fsit$setPose(pose, pos);
 
-        UpdatePoseCallback.EVENT.invoker().onUpdatePose((ServerPlayerEntity) (Object) this, pose, pos);
+        UpdatePoseCallback.EVENT.invoker().updatePose((ServerPlayerEntity) (Object) this, pose, pos);
     }
 
     @Override

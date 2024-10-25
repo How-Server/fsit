@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.event
 
+import dev.rvbsm.fsit.api.event.PassedUseBlockCallback
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.setPose
