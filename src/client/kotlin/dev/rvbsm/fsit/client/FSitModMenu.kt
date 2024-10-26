@@ -21,6 +21,7 @@ import dev.rvbsm.fsit.registry.RegistryIdentifier
 import dev.rvbsm.fsit.registry.toRegistrySet
 import dev.rvbsm.fsit.util.text.translatable
 import net.minecraft.registry.Registries
+import net.minecraft.text.Text
 
 // todo: make it look better 👽
 object FSitModMenu : ModMenuApi {
@@ -56,14 +57,14 @@ object FSitModMenu : ModMenuApi {
                     val keybindings by groups.registering {
                         descriptionBuilder { addDefaultText() }
 
-                        val sitMode by rootOptions.registering {
-                            controller = enumSwitch<KeyBindingMode>()
+                        val sitMode by options.registering {
+                            controller = enumSwitch<KeyBindingMode> { Text.translatable(it.translationKey) }
                             binding(KeyBindingMode.Hybrid, FSitModClient.sitMode::getValue, FSitModClient.sitMode::setValue)
                             descriptionBuilder { addDefaultText() }
                         }
 
-                        val crawlMode by rootOptions.registering {
-                            controller = enumSwitch<KeyBindingMode>()
+                        val crawlMode by options.registering {
+                            controller = enumSwitch<KeyBindingMode> { Text.translatable(it.translationKey) }
                             binding(KeyBindingMode.Hybrid, FSitModClient.crawlMode::getValue, FSitModClient.crawlMode::setValue)
                             descriptionBuilder { addDefaultText() }
                         }
