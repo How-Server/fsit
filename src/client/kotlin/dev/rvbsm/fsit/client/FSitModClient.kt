@@ -18,6 +18,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.option.SimpleOption
 import net.minecraft.command.argument.GameProfileArgumentType
+import net.minecraft.text.Text
+import java.util.UUID
 
 object FSitModClient : ClientModInitializer {
 
@@ -76,24 +78,23 @@ object FSitModClient : ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register(ClientConnectionListener)
     }
 
-    // todo: mm spaghetti
     private fun registerClientCommands() {
         command("${FSitMod.MOD_ID}:client") {
-            setOf("allow" to RestrictionList::addOrThrow, "restrict" to RestrictionList::removeOrThrow).forEach { cmd ->
-                literal(cmd.first) {
-                    argument("player", { source.playerNames }) { playerName ->
-                        executes {
-                            val entry = source.client.networkHandler?.getPlayerListEntry(playerName())
-                                ?: throw GameProfileArgumentType.UNKNOWN_PLAYER_EXCEPTION.create()
+            fun restrictionCommand(name: String, action: (UUID) -> Boolean, message: (Text?) -> Text) = literal(name) {
+                argument("player", { source.playerNames }) { playerName ->
+                    executes {
+                        val entry = source.client.networkHandler?.getPlayerListEntry(playerName())
+                            ?: throw GameProfileArgumentType.UNKNOWN_PLAYER_EXCEPTION.create()
 
-                            if (cmd.second(entry.profile.id)) {
-                                // todo: improve this piece of
-                                source.sendFeedback("Successfully ${cmd.first.replaceFirstChar { it.uppercase() }}ed ${entry.displayName}".literal())
-                            }
+                        if (action(entry.profile.id)) {
+                            source.sendFeedback(message(entry.displayName))
                         }
                     }
                 }
             }
+
+            restrictionCommand("allow", RestrictionList::removeOrThrow) { "Successfully allowed $it.".literal() }
+            restrictionCommand("restrict", RestrictionList::addOrThrow) { "Successfully restricted $it.".literal() }
         }
     }
 }
