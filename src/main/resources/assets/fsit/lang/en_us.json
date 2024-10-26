@@ -4,13 +4,18 @@
   "yacl3.config.fsit.category.onSneak": "Sneak Interactions",
 
   "yacl3.config.fsit.category.general.group.sitting": "Sitting",
-  "yacl3.config.fsit.category.general.group.riding": "Riding",
-  "yacl3.config.fsit.category.general.group.sitting.description": "Sitting features.",
-  "yacl3.config.fsit.category.general.group.riding.description": "Riding features.",
+  "yacl3.config.fsit.category.general.group.keybindings": "Key Bindings",
+
+  "yacl3.config.fsit.category.general.group.sitting.description.1": "Sitting features.",
+  "yacl3.config.fsit.category.general.group.keybindings.description.1": "Key Bindings behaviour:\n",
+  "yacl3.config.fsit.category.general.group.keybindings.description.2": "§lHold§r and §lToggle§r works the same as Vanilla.",
+  "yacl3.config.fsit.category.general.group.keybindings.description.3": "§lHybrid§r is an in-between mechanic, that works as Toggle on single-use and as Hold on holding.",
 
   "yacl3.config.fsit.category.general.root.option.useServer": "Use Server Configuration",
   "yacl3.config.fsit.category.general.group.sitting.option.behaviour": "Seats behaviour",
   "yacl3.config.fsit.category.general.group.sitting.option.shouldCenter": "Seats centering",
+  "yacl3.config.fsit.category.general.group.keybindings.option.sitMode": "Sitting",
+  "yacl3.config.fsit.category.general.group.keybindings.option.crawlMode": "Crawling",
   "yacl3.config.fsit.category.onUse.root.option.sitting": "Sit on Blocks",
   "yacl3.config.fsit.category.onUse.root.option.riding": "Ride players",
   "yacl3.config.fsit.category.onUse.root.option.range": "Interaction Range",
@@ -27,6 +32,8 @@
   "yacl3.config.fsit.category.general.group.sitting.option.behaviour.description.3": "§lDiscard§r: gets discarded without supporting block underneath them.",
   "yacl3.config.fsit.category.general.group.sitting.option.behaviour.description.4": "§lGravity§r: applies movement (pistons, fluids, falling, etc.).",
   "yacl3.config.fsit.category.general.group.sitting.option.shouldCenter.description.1": "Controls whether seats should be centered at the position.",
+  "yacl3.config.fsit.category.general.group.keybindings.option.sitMode.description.1": "Controls behaviour of sitting key.",
+  "yacl3.config.fsit.category.general.group.keybindings.option.crawlMode.description.1": "Controls behaviour of crawling key.",
   "yacl3.config.fsit.category.onUse.root.option.sitting.description.1": "Allows to start sitting on specific blocks by interacting with them.",
   "yacl3.config.fsit.category.onUse.root.option.riding.description.1": "Allows to start riding other players by interaction with them.",
   "yacl3.config.fsit.category.onUse.root.option.range.description.1": "The maximum distance to a target to interact.",
@@ -37,8 +44,6 @@
   "yacl3.config.fsit.category.onSneak.root.option.minPitch.description.1": "The minimum angle must be looking down (in degrees) with double sneak.",
   "yacl3.config.fsit.category.onSneak.root.option.delay.description.1": "The window between sneaks (in milliseconds).",
 
-  "key.fsit.sit": "Sit",
-  "key.fsit.crawl": "Crawl",
   "option.fsit.key.hybrid": "Hybrid",
 
   "gui.fsit.socialInteractions.restrict": "Disallow Riding",

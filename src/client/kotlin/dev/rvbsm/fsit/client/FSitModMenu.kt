@@ -14,6 +14,7 @@ import dev.isxander.yacl3.dsl.slider
 import dev.isxander.yacl3.dsl.tickBox
 import dev.rvbsm.fsit.FSitMod
 import dev.rvbsm.fsit.client.gui.controller.RegistryController
+import dev.rvbsm.fsit.client.option.KeyBindingMode
 import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.config.Sitting
 import dev.rvbsm.fsit.registry.RegistryIdentifier
@@ -48,6 +49,22 @@ object FSitModMenu : ModMenuApi {
                         val shouldCenter by options.registering {
                             controller = tickBox()
                             binding(FSitMod.config.sitting::shouldCenter, defaultConfig.sitting.shouldCenter)
+                            descriptionBuilder { addDefaultText() }
+                        }
+                    }
+
+                    val keybindings by groups.registering {
+                        descriptionBuilder { addDefaultText() }
+
+                        val sitMode by rootOptions.registering {
+                            controller = enumSwitch<KeyBindingMode>()
+                            binding(KeyBindingMode.Hybrid, FSitModClient.sitMode::getValue, FSitModClient.sitMode::setValue)
+                            descriptionBuilder { addDefaultText() }
+                        }
+
+                        val crawlMode by rootOptions.registering {
+                            controller = enumSwitch<KeyBindingMode>()
+                            binding(KeyBindingMode.Hybrid, FSitModClient.crawlMode::getValue, FSitModClient.crawlMode::setValue)
                             descriptionBuilder { addDefaultText() }
                         }
                     }
