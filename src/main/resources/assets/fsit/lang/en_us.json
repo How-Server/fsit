@@ -44,6 +44,8 @@
   "yacl3.config.fsit.category.onSneak.root.option.minPitch.description.1": "The minimum angle must be looking down (in degrees) with double sneak.",
   "yacl3.config.fsit.category.onSneak.root.option.delay.description.1": "The window between sneaks (in milliseconds).",
 
+  "key.fsit.sit": "Sit",
+  "key.fsit.crawl": "Crawl",
   "option.fsit.key.hybrid": "Hybrid",
 
   "gui.fsit.socialInteractions.restrict": "Disallow Riding",
