@@ -15,18 +15,20 @@ class HybridKeyBinding(
     private val duration: Duration,
     private val modeGetter: () -> KeyBindingMode,
 ) : KeyBinding(id, InputUtil.Type.KEYSYM, code, category) {
+
     private val timeSource = TimeSource.Monotonic
     private var pressMark = timeSource.markNow()
     private var prevPressed = false
-    private var prevSticky = false
+    private var isSticky = false
 
     override fun setPressed(pressed: Boolean) {
-        val isSticky = when (modeGetter()) {
+        isSticky = when (modeGetter()) {
             KeyBindingMode.Toggle -> true
             KeyBindingMode.Hold -> false
-            KeyBindingMode.Hybrid -> (!pressed.also {
-                if (pressed) pressMark = timeSource.markNow()
-            } && prevPressed && timeSource.markNow() - pressMark <= duration) || prevSticky
+            KeyBindingMode.Hybrid -> isSticky.let {
+                if (pressed) isSticky.also { pressMark = timeSource.markNow() }
+                else if (prevPressed) timeSource.markNow() - pressMark <= duration else isSticky
+            }
         }
 
         if (isSticky && pressed) {
@@ -36,7 +38,6 @@ class HybridKeyBinding(
         }
 
         prevPressed = pressed
-        prevSticky = isSticky
     }
 
     internal fun untoggle() {
