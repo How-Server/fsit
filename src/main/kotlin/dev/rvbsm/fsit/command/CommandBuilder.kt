@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.command
 
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.DoubleArgumentType
@@ -23,28 +24,35 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.util.Identifier
 import java.util.UUID
 
-val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+val commandScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
 abstract class CommandBuilder<S, B> where S : CommandSource, B : ArgumentBuilder<S, B> {
     abstract val builder: B
+    val children = mutableListOf<CommandBuilder<S, *>>()
+
+    fun build(): B {
+        children.forEach { builder.then(it.build() as B) }
+
+        return builder
+    }
 
     inline fun literal(name: String, literalBuilder: LiteralCommandBuilder<S>.() -> Unit = {}) =
-        LiteralCommandBuilder<S>(name).apply(literalBuilder).also { builder.then(it.builder) }
+        LiteralCommandBuilder<S>(name).apply(literalBuilder).also { children += it }
 
     fun requires(requirement: (S) -> Boolean) = also { builder.requires(requirement) }
 
     inline infix fun executes(crossinline command: CommandContext<S>.() -> Unit) =
-        also { builder.executes { command(it); 0 } }
+        also { builder.executes { command(it); Command.SINGLE_SUCCESS } }
 
     inline infix fun executesSuspend(crossinline command: suspend CommandContext<S>.() -> Unit) =
-        executes { scope.launch { command() } }
+        executes { commandScope.launch { command() } }
 
     inline fun <reified T> argument(
         name: String,
         type: ArgumentType<T>,
         argumentBuilder: ArgumentCommandBuilder<S, T>.(argument: CommandContext<S>.() -> T) -> Unit,
     ) = ArgumentCommandBuilder<S, T>(name, type).apply { argumentBuilder { getArgument(name, T::class.java) } }
-        .also { builder.then(it.builder) }
+        .also { children += it }
 
     inline fun <reified T> argument(
         name: String,
@@ -58,7 +66,7 @@ abstract class CommandBuilder<S, B> where S : CommandSource, B : ArgumentBuilder
         argumentBuilder: ArgumentCommandBuilder<S, String>.(argument: CommandContext<S>.() -> T) -> Unit,
     ) = ArgumentCommandBuilder.simple(name, provider)
         .apply { argumentBuilder { transformer(getArgument(name, String::class.java)) } }
-        .also { this.builder.then(it.builder) }
+        .also { children += it }
 
     inline fun argument(
         name: String,
@@ -106,6 +114,6 @@ inline fun <reified T> getArgumentType(): ArgumentType<T> = when (T::class) {
 inline fun command(name: String, builder: LiteralCommandBuilder<ServerCommandSource>.() -> Unit) =
     LiteralCommandBuilder<ServerCommandSource>(name).apply(builder).also {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
-            dispatcher.register(it.builder)
+            dispatcher.register(it.build())
         }
     }
