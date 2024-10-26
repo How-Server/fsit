@@ -14,7 +14,7 @@ import kotlin.time.measureTimedValue
  * @see net.minecraft.entity.vehicle.AbstractMinecartEntity.updatePassengerForDismount
  * @see net.minecraft.entity.vehicle.BoatEntity.updatePassengerForDismount
  */
-fun getDismountPosition(vehicle: Entity, passenger: LivingEntity): Vec3d = measureTimedValue {
+fun getDismountPosition(vehicle: Entity, passenger: LivingEntity): Vec3d {
     val world = vehicle.world
     val vehiclePos = vehicle.pos
 
@@ -27,9 +27,9 @@ fun getDismountPosition(vehicle: Entity, passenger: LivingEntity): Vec3d = measu
 
         passenger.poses.find { canPlaceEntityAt(world, dismountPos, passenger, it) }?.let {
             passenger.pose = it
-            return@measureTimedValue dismountPos
+            return dismountPos
         }
     }
 
-    return@measureTimedValue vehiclePos
-}.also { println("${it.duration}") }.value
+    return vehiclePos
+}
