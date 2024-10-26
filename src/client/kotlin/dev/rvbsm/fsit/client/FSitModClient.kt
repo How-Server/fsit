@@ -5,8 +5,9 @@ import dev.rvbsm.fsit.FSitMod
 import dev.rvbsm.fsit.client.command.command
 import dev.rvbsm.fsit.client.config.RestrictionList
 import dev.rvbsm.fsit.client.event.ClientConnectionListener
+import dev.rvbsm.fsit.client.event.KeyBindingsListener
+import dev.rvbsm.fsit.client.event.POSE_KEYBINDINGS
 import dev.rvbsm.fsit.client.networking.receive
-import dev.rvbsm.fsit.client.option.FSitKeyBindings
 import dev.rvbsm.fsit.client.option.KeyBindingMode
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
 import dev.rvbsm.fsit.networking.payload.CustomPayload
@@ -14,6 +15,8 @@ import dev.rvbsm.fsit.networking.payload.PoseUpdateS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
 import dev.rvbsm.fsit.util.text.literal
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.option.SimpleOption
@@ -52,11 +55,11 @@ object FSitModClient : ClientModInitializer {
 
     override fun onInitializeClient() {
         RestrictionList.load()
-        FSitKeyBindings.register()
 
         registerClientPayloads()
         registerClientEvents()
         registerClientCommands()
+        registerKeyBindings()
     }
 
     fun saveConfig() = FSitMod.saveConfig().also {
@@ -96,5 +99,10 @@ object FSitModClient : ClientModInitializer {
             restrictionCommand("allow", RestrictionList::removeOrThrow) { "Successfully allowed $it.".literal() }
             restrictionCommand("restrict", RestrictionList::addOrThrow) { "Successfully restricted $it.".literal() }
         }
+    }
+
+    private fun registerKeyBindings() {
+        POSE_KEYBINDINGS.forEach { KeyBindingHelper.registerKeyBinding(it) }
+        ClientTickEvents.END_CLIENT_TICK.register(KeyBindingsListener)
     }
 }

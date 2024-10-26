@@ -2,7 +2,7 @@ package dev.rvbsm.fsit.client.networking
 
 import dev.rvbsm.fsit.client.FSitModClient
 import dev.rvbsm.fsit.client.config.RestrictionList
-import dev.rvbsm.fsit.client.option.FSitKeyBindings
+import dev.rvbsm.fsit.client.event.untoggleKeyBindings
 import dev.rvbsm.fsit.networking.payload.PoseUpdateS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload
@@ -19,7 +19,7 @@ internal fun PoseUpdateS2CPayload.receive(
 
     if (player.pose() != pose) {
         player.setPose(pose)
-        FSitKeyBindings.reset()
+        untoggleKeyBindings()
     }
 }
 
