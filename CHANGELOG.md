@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.6.1
+
+### Changed
+
+- Dismounting a player will try to find safe to dismount position
+- Key bindings behaviour options were moved to the Mod Menu
+- Seats will apply velocity only if it is big enough (`sitting.behaviour` is `Gravity`)
+
+### Fixed
+
+- `/fsit:client allow` and `/fsit:client restrict` did opposite things
+- Hybrid key bindings mode was working wrong
+
 ## v2.6.0
 
 Minecraft Bundles of Bravery Update
