@@ -175,21 +175,10 @@ val proguardJar by tasks.registering(ProGuardTask::class) {
         stonecutter.eval(stonecutter.current.project, ">${it.project}")
     }.map { ":${it.project}:$name" })
 
-    verbose()
-    dontwarn()
+    configuration("$rootDir/proguard.txt")
 
     injars(tasks.remapJar)
     outjars(rootProject.layout.buildDirectory.map { it.file("libs/${rootProject.name}-$version.jar") })
-
-    libraryjars("${System.getProperty("java.home")}/jmods")
-
-    dontobfuscate()
-
-    keepattributes()
-    keepparameternames()
-    keepkotlinmetadata()
-
-    keep("class !dev.rvbsm.fsit.lib.** { *; }")
 
     // blackd "~ the GOAT"
     // https://github.com/blackd/Inventory-Profiles/blob/c66b8adf57684d94eb272eb741864e74d78f522f/platforms/fabric-1.21/build.gradle.kts#L254-L257

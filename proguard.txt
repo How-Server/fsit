@@ -1,0 +1,10 @@
+-libraryjars <java.home>/jmods/java.base.jmod(!**.jar;!module-info.class)
+
+-dontwarn
+-dontobfuscate
+
+-keep class kotlin.Metadata
+-keep class !dev.rvbsm.fsit.lib.** { *; }
+
+-keepattributes
+-keepparameternames
