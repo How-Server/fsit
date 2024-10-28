@@ -43,9 +43,10 @@ Can be accessed with [Social Interactions Screen] or using `/fsit:client allow|r
 
 Double sneak while looking down to sit right away. ([`on_sneak.sitting`](#on_sneaksitting))
 
-Doing the same, but near the hole will start crawling otherwise. ([`on_sneak.crawling`](#on_sneakcrawling))
+Doing the same, but near the hole, will start crawling otherwise. ([`on_sneak.crawling`](#on_sneakcrawling))
 
-Minimal pitch and maximum sneak window can be configured with [`on_sneak.min_pitch`](#on_sneakmin_pitch) and [`on_sneak.delay`](#on_sneakdelay) accordingly.
+Minimal pitch and maximum sneak window can be configured with [`on_sneak.min_pitch`](#on_sneakmin_pitch) and
+[`on_sneak.delay`](#on_sneakdelay) accordingly.
 
 ### Commands
 
@@ -77,7 +78,7 @@ For clients, configuration can be modified with [Mod Menu] and [YetAnotherConfig
 <summary><i>What is that in the background?</i></summary>
 
 WaveTech's villager trading matrix by [cubicmetre](https://youtu.be/oJDRiV3kJJI)
-designed by [mrmaxmondays](https://youtu.be/8OLzXqe3f5g). 
+designed by [mrmaxmondays](https://youtu.be/8OLzXqe3f5g).
 
 </details>
 
@@ -186,8 +187,7 @@ Since the project uses [Stonecutter], the build is performed using `chiseledBuil
 > ./gradlew chiseledBuild
 ```
 
-Publishing is done with `chiseledPublish` task, 
-must be used only after successful `chiseledBuild` task.
+Publishing is done with `chiseledPublish` task:
 
 ```shell
 > ./gradlew chiseledPublish
