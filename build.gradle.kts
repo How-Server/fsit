@@ -210,7 +210,7 @@ kotlin {
 }
 
 publishMods {
-    file = proguardJar.get().outputs.files.singleFile
+    file = proguardJar.map { it.outputs.files.singleFile }
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = providers.environmentVariable("CHANGELOG").orElse("No changelog provided.")
     type = when {
