@@ -22,8 +22,8 @@ Minecraft Bundles of Bravery Update
 - Better(?) configuration migrations
 - Asynchronous configuration update packet handler
 - Packed with Shadow and Proguard Gradle plugins
-- `sitting.apply_gravity` and `sitting.allow_in_air` had a little conflict and were replaced with `sitting.behaviour`. It can
-  have three values:
+- `sitting.apply_gravity` and `sitting.allow_in_air` had a little conflict and were replaced with `sitting.behaviour`.
+  It can have three values:
   - `nothing`: does nothing
   - `discard`: discards seats if they do not have any supporting block underneath them
   - `gravity`: applies movement to seats, e.g. gravity, getting pushed by pistons, fluids
@@ -82,8 +82,8 @@ Minecraft Bundles of Bravery Update
 - Better(?) configuration migrations
 - Asynchronous configuration update packet handler
 - Packed with Shadow and Proguard Gradle plugins
-- `sitting.apply_gravity` and `sitting.allow_in_air` had a little conflict and were replaced with `sitting.behaviour`. `sitting.behaviour` can
-  have three values: 
+- `sitting.apply_gravity` and `sitting.allow_in_air` had a little conflict and were replaced with `sitting.behaviour`.
+  `sitting.behaviour` can have three values:
   - `nothing`: does nothing
   - `discard`: discards seats if they do not have any supporting block underneath them
   - `gravity`: applies movement to seats, e.g. gravity, getting pushed by pistons, fluids
@@ -137,7 +137,7 @@ Minecraft Bundles of Bravery Update
 
 ## v2.4.0
 
-Minecraft Tricky Trials Update 
+Minecraft Tricky Trials Update
 
 ### Fixed
 
@@ -198,11 +198,11 @@ Minecraft Tricky Trials Update
 
 ### New Contributors
 
-- @TheWhiteDog9487 made their first contribution at https://github.com/rvbsm/fsit/pull/35
+- @TheWhiteDog9487 made their first contribution at [#35](https://github.com/rvbsm/fsit/pull/35)
 
 ### Added
 
-- Simplified Chinese translation by @TheWhiteDog9487 at https://github.com/rvbsm/fsit/pull/35. Thank you!
+- Simplified Chinese translation by @TheWhiteDog9487 at [#35#](https://github.com/rvbsm/fsit/pull/35). Thank you!
 - Support Minecraft 1.20.5
 - Try to start riding on passed uses (totems in offhand, food, etc.)
 - Start crawling by double sneaking near a one-block gap
@@ -249,8 +249,6 @@ Minecraft Tricky Trials Update
 
 - `fabric-events-interaction-v0` dependency
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v2.1.0...v2.2.0
-
 ## v2.1.0
 
 ### Added
@@ -280,8 +278,6 @@ Minecraft Tricky Trials Update
 - Player would swim in the air while crawling
 - Clipping through a floor when using sit keybinding on servers
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v2.0.1...v2.1.0
-
 ## v2.0.1
 
 ### Added
@@ -299,15 +295,13 @@ Minecraft Tricky Trials Update
 - Player stops crawling in places where he can start crouching
 - Restrict buttons offset in 1.20.4
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v2.0.0...v2.0.1
-
 ## v2.0.0
 
 **BREAKING CHANGE: Fabric Language Kotlin is now a required dependency**
 
 ### New Contributors
 
-- @JustAlittleWolf made their first contribution at https://github.com/rvbsm/fsit/pull/30
+- @JustAlittleWolf made their first contribution at [#30](https://github.com/rvbsm/fsit/pull/30)
 
 ### Added
 
@@ -332,8 +326,6 @@ Minecraft Tricky Trials Update
 
 - Sit by double sneaking
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.5.1-1.20.2...v2.0.0
-
 ## v1.5.1
 
 ### Added
@@ -344,8 +336,6 @@ Minecraft Tricky Trials Update
 
 - `/fsit get` and `/fsit set` commands autocompletion [#27](https://github.com/rvbsm/fsit/issues/27)
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.5.0-1.20.2...v1.5.1-1.20.2
-
 ## v1.5.0
 
 ### Added
@@ -355,9 +345,8 @@ Minecraft Tricky Trials Update
 
 ### Fixed
 
-- The server crashed when the player tried to ride himself (e.g., free cam) [#25](https://github.com/rvbsm/fsit/issues/25)
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.4.2...v1.5.0-1.20.2
+- The server crashed when the player tried to ride himself (e.g., free
+  cam) [#25](https://github.com/rvbsm/fsit/issues/25)
 
 ## v1.4.2
 
@@ -365,15 +354,11 @@ Minecraft Tricky Trials Update
 
 - Was unable to dismount player if `sneak.enabled` is disabled
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.4.1...v1.4.2
-
 ## v1.4.1
 
 ### Fixed
 
 - Client configuration was not sent to server :grin:
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.4.0...v1.4.1
 
 ## v1.4.0
 
@@ -397,15 +382,11 @@ _P.S. Thanks for 2K downloads at Modrinth_ :heart:
 
 - `riding.height` was removed due to the correct position of players' passengers in Minecraft 1.20.2 :tada:
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.3.2...v1.4.0
-
 ## v1.3.2
 
 ### Fixed
 
 - Configuration manager had been resetting some fields
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.3.1...v1.3.2
 
 ## v1.3.1
 
@@ -424,8 +405,6 @@ _P.S. Thanks for 2K downloads at Modrinth_ :heart:
 - Crawling support entity did not disappear
 - Crawling with Speed II and Swift Sneak III
 - Configuration was sent to the server even if the player was not connected to one
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.3.0...v1.3.1
 
 ## v1.3.0
 
@@ -446,8 +425,6 @@ _FSit-client is now a part of the FSit_
 - The player immediately stopped sitting on the edge of a block
 - Random crashes with invalid configuration
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.2.0...v1.3.0
-
 ## v1.2.0
 
 ### Added
@@ -458,15 +435,11 @@ _FSit-client is now a part of the FSit_
 
 - [revert] Does not start sitting by interaction if a player is sneaking
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.1.3...v1.2.0
-
 ## v1.1.3
 
 ### Fixed
 
 - The rider's position was not updated if the player did not have a client-side mod installed
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.1.2...v1.1.3
 
 ## v1.1.2
 
@@ -474,15 +447,11 @@ _FSit-client is now a part of the FSit_
 
 - Interaction with entity swung hand all the times
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.1.1...v1.1.2
-
 ## v1.1.1
 
 ### Fixed
 
 - Blocks weren't placed
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.1.0...v1.1.1
 
 ## v1.1.0
 
@@ -504,8 +473,6 @@ _FSit-client is now a part of the FSit_
   - `sittable_tags` → `sittable.tags`
   - `sit_on_players` → `misc.sit_players`
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.1...v1.1.0
-
 ## v1.0.1
 
 ### Added
@@ -517,8 +484,6 @@ _FSit-client is now a part of the FSit_
 ### Fixed
 
 - Interaction with entity when player's pitch is greater than `min_angle` sits the player
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0...v1.0.1
 
 ## v1.0.0
 
@@ -536,8 +501,6 @@ _FSit-client is now a part of the FSit_
 
 - `/sit` didn't reset player's pose
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.8...v1.0.0
-
 ## v1.0.0-beta.8
 
 another beta
@@ -551,8 +514,6 @@ another beta
 
 - The player's position did not change for other clients when he started riding another player
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.7...v1.0.0-beta.8
-
 ## v1.0.0-beta.7
 
 ### Added
@@ -562,8 +523,6 @@ another beta
 ### Fixed
 
 - Do not allow sitting in spectator mode
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.6...v1.0.0-beta.7
 
 ## v1.0.0-beta.6
 
@@ -575,8 +534,6 @@ another beta
 
 - Use `night-config` instead of `toml4j`
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.5...v1.0.0-beta.6
-
 ## v1.0.0-beta.5
 
 ### Added
@@ -585,16 +542,12 @@ another beta
 - Use Cloth Configuration for Mod Menu integration
 - Include `toml4j`
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.4...v1.0.0-beta.5
-
 ## v1.0.0-beta.4
 
 ### Added
 
 - Configuration file
 - [WIP] Mod Menu integration (1.19.4 only)
-
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.3...v1.0.0-beta.4
 
 ## v1.0.0-beta.3
 
@@ -610,8 +563,6 @@ another beta
 
 - A bucket of water was used, and the seat was called in while interacting with the water-loggable block
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.2...v1.0.0-beta.3
-
 ## v1.0.0-beta.2
 
 ### Added
@@ -626,8 +577,6 @@ another beta
 
 - Vehicle dismounting was counted as a sneak
 
-**Full Changelog**: https://github.com/rvbsm/fsit/compare/v1.0.0-beta.1...v1.0.0-beta.2
-
 ## v1.0.0-beta.1
 
 Initial release
@@ -636,5 +585,3 @@ Initial release
 
 - Sit on slabs or stairs
 - Sit on double sneak
-
-**Full Changelog**: https://github.com/rvbsm/fsit/commits/v1.0.0-beta.1
