@@ -88,7 +88,9 @@ dependencies {
     modLibs.fabricApi.forEach(::modImplementation)
 
     modImplementation(modLibs.modmenu)
-    modImplementation(modLibs.yacl)
+    modImplementation(modLibs.yacl) {
+        exclude("net.fabricmc.fabric-api", "fabric-api")
+    }
 
     implementation(libs.kaml)
     shadowInclude(libs.kaml)
