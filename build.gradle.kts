@@ -88,9 +88,7 @@ dependencies {
     modLibs.fabricApi.forEach(::modImplementation)
 
     modImplementation(modLibs.modmenu)
-    modImplementation(modLibs.yacl) {
-        exclude("net.fabricmc.fabric-api", "fabric-api")
-    }
+    modImplementation(modLibs.yacl)
 
     implementation(libs.kaml)
     shadowInclude(libs.kaml)
@@ -129,10 +127,11 @@ tasks {
 
         configurations = listOf(shadowInclude)
 
-        relocate("it.krzeminski.snakeyaml.engine.kmp", "dev.rvbsm.fsit.lib.snakeyaml-kmp")
-        relocate("com.charleskorn.kaml", "dev.rvbsm.fsit.lib.kaml")
-        relocate("okio", "dev.rvbsm.fsit.lib.okio")
-        relocate("net.thauvin.erik.urlencoder", "dev.rvbsm.fsit.lib.urlencoder")
+        val relocationPath = "dev.rvbsm.fsit.lib"
+        relocate("it.krzeminski.snakeyaml.engine.kmp", "$relocationPath.snakeyaml-kmp")
+        relocate("com.charleskorn.kaml", "$relocationPath.kaml")
+        relocate("okio", "$relocationPath.okio")
+        relocate("net.thauvin.erik.urlencoder", "$relocationPath.urlencoder")
 
         exclude("kotlin/**")
         exclude("kotlinx/**")
@@ -242,7 +241,7 @@ publishMods {
 private fun String.dropFirstIf(char: Char) = if (first() == char) drop(1) else this
 
 private fun String.runCommand() = runCatching {
-    ProcessBuilder(split(" "))
+    ProcessBuilder(split(' '))
         .start().apply { waitFor(10, TimeUnit.SECONDS) }
         .inputStream.bufferedReader().readText().trim()
 }.onFailure { it.printStackTrace() }.getOrNull()
