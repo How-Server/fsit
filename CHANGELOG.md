@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.6.2
+
+### Fixed
+
+- Crash during client startup due to oopsie daisy with `KeyBindingMixin`.
+  Thanks [#47](https://github.com/rvbsm/fsit/issues/47)
+
 ## v2.6.1
 
 ### Changed
