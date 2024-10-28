@@ -28,7 +28,7 @@ private val crawlKey = HybridKeyBinding(
     FSitModClient.crawlMode::getValue,
 )
 
-val POSE_KEYBINDINGS = arrayOf(sitKey, crawlKey)
+val poseKeybindings = arrayOf(sitKey, crawlKey)
 private var wasPressed = false
 
 val KeyBindingsListener = ClientTickEvents.EndTick tick@{ client ->
@@ -60,5 +60,5 @@ val KeyBindingsListener = ClientTickEvents.EndTick tick@{ client ->
 }
 
 internal fun untoggleKeyBindings() {
-    POSE_KEYBINDINGS.forEach { it.untoggle() }
+    poseKeybindings.forEach { it.untoggle() }
 }

@@ -6,7 +6,7 @@ import dev.rvbsm.fsit.client.command.command
 import dev.rvbsm.fsit.client.config.RestrictionList
 import dev.rvbsm.fsit.client.event.ClientConnectionListener
 import dev.rvbsm.fsit.client.event.KeyBindingsListener
-import dev.rvbsm.fsit.client.event.POSE_KEYBINDINGS
+import dev.rvbsm.fsit.client.event.poseKeybindings
 import dev.rvbsm.fsit.client.networking.receive
 import dev.rvbsm.fsit.client.option.KeyBindingMode
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
@@ -102,7 +102,7 @@ object FSitModClient : ClientModInitializer {
     }
 
     private fun registerKeyBindings() {
-        POSE_KEYBINDINGS.forEach { KeyBindingHelper.registerKeyBinding(it) }
+        poseKeybindings.forEach { KeyBindingHelper.registerKeyBinding(it) }
         ClientTickEvents.END_CLIENT_TICK.register(KeyBindingsListener)
     }
 }
