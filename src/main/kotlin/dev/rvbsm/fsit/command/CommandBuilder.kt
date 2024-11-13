@@ -12,9 +12,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import dev.rvbsm.fsit.modScope
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandSource
@@ -23,8 +21,6 @@ import net.minecraft.command.argument.UuidArgumentType
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.util.Identifier
 import java.util.UUID
-
-val commandScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
 abstract class CommandBuilder<S, B> where S : CommandSource, B : ArgumentBuilder<S, B> {
     abstract val builder: B
@@ -45,7 +41,7 @@ abstract class CommandBuilder<S, B> where S : CommandSource, B : ArgumentBuilder
         also { builder.executes { command(it); Command.SINGLE_SUCCESS } }
 
     inline infix fun executesSuspend(crossinline command: suspend CommandContext<S>.() -> Unit) =
-        executes { commandScope.launch { command() } }
+        executes { modScope.launch { command() } }
 
     inline fun <reified T> argument(
         name: String,

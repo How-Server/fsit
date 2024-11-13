@@ -3,7 +3,6 @@ package dev.rvbsm.fsit.client
 import dev.rvbsm.fsit.FSitMod
 import dev.rvbsm.fsit.client.command.command
 import dev.rvbsm.fsit.client.config.RestrictionList
-import dev.rvbsm.fsit.client.event.ClientConnectionListener
 import dev.rvbsm.fsit.client.event.KeyBindingsListener
 import dev.rvbsm.fsit.client.event.poseKeybindings
 import dev.rvbsm.fsit.client.networking.PoseUpdateS2CHandler
@@ -15,7 +14,12 @@ import dev.rvbsm.fsit.networking.payload.CustomPayload
 import dev.rvbsm.fsit.networking.payload.PoseUpdateS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
 import dev.rvbsm.fsit.util.text.literal
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -23,6 +27,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.command.argument.GameProfileArgumentType
 import net.minecraft.text.Text
 import java.util.UUID
+
+internal lateinit var modClientScope: CoroutineScope
+    private set
 
 object FSitModClient : ClientModInitializer {
 
@@ -35,6 +42,21 @@ object FSitModClient : ClientModInitializer {
     @JvmStatic
     val crawlMode = enumOption("key.fsit.crawl", KeyBindingMode.Hybrid)
 
+    internal fun <T> trySend(payload: T, orAction: () -> Unit = {}) where T : CustomPayload<T> {
+        if (ClientPlayNetworking.canSend(payload.id)) {
+            ClientPlayNetworking.send(payload)
+        } else orAction()
+    }
+
+    internal suspend fun saveConfig() {
+        FSitMod.saveConfig()
+        syncConfig()
+    }
+
+    private suspend fun syncConfig() {
+        trySend(ConfigUpdateC2SPayload.encode(FSitMod.config))
+    }
+
     override fun onInitializeClient() {
         RestrictionList.load()
 
@@ -44,23 +66,19 @@ object FSitModClient : ClientModInitializer {
         registerKeyBindings()
     }
 
-    fun saveConfig() = FSitMod.saveConfig().also {
-        trySend(ConfigUpdateC2SPayload(FSitMod.config))
-    }
-
-    fun <T> trySend(payload: T, orAction: () -> Unit = {}) where T : CustomPayload<T> {
-        if (ClientPlayNetworking.canSend(payload.id)) {
-            ClientPlayNetworking.send(payload)
-        } else orAction()
-    }
-
     private fun registerClientPayloads() {
         ClientPlayNetworking.registerGlobalReceiver(PoseUpdateS2CPayload.packetId, PoseUpdateS2CHandler)
         ClientPlayNetworking.registerGlobalReceiver(RidingRequestS2CPayload.packetId, RidingRequestS2CHandler)
     }
 
     private fun registerClientEvents() {
-        ClientPlayConnectionEvents.JOIN.register(ClientConnectionListener)
+        ClientLifecycleEvents.CLIENT_STARTED.register {
+            modClientScope = CoroutineScope(it.asCoroutineDispatcher() + SupervisorJob())
+        }
+
+        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+            modClientScope.launch { syncConfig() }
+        }
     }
 
     private fun registerClientCommands() {

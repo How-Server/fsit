@@ -10,6 +10,7 @@ import dev.rvbsm.fsit.config.OnUse
 import dev.rvbsm.fsit.config.Sitting
 import dev.rvbsm.fsit.config.serialization.ConfigSerializer
 import dev.rvbsm.fsit.registry.registrySetOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
@@ -192,7 +193,7 @@ object ConfigSerializerTest {
     }
 
     @Test
-    fun `test JSON`() {
+    fun testJSON() = runBlocking {
         val actualConfig = measureTimedValue { jsonSerializer.decode(jsonSerializer.encode(expectedConfig)) }
 
         logger.info("(JSON) deserialization time: ${actualConfig.duration}")
@@ -200,7 +201,7 @@ object ConfigSerializerTest {
     }
 
     @Test
-    fun `test YAML`() {
+    fun testYAML() = runBlocking {
         val actualConfig = measureTimedValue { yamlSerializer.decode(yamlSerializer.encode(expectedConfig)) }
 
         logger.info("(YAML) deserialization time: ${actualConfig.duration}")
@@ -208,7 +209,7 @@ object ConfigSerializerTest {
     }
 
     @Test
-    fun `test JSON ancient (mod v1)`() {
+    fun testAncientJSON() = runBlocking {
         expectedAncientConfigs.forEach { (version, expectedConfig) ->
             val jsonConfig = readResource("configs/$version.json")
             val actualConfig = measureTimedValue { jsonSerializer.decode(jsonConfig) }
@@ -219,7 +220,7 @@ object ConfigSerializerTest {
     }
 
     @Test
-    fun `test JSON legacy (mod v2)`() {
+    fun testLegacyJSON() = runBlocking {
         expectedLegacyConfigs.forEach { (version, expectedConfig) ->
             val jsonConfig = readResource("configs/$version.json")
             val actualConfig = measureTimedValue { jsonSerializer.decode(jsonConfig) }
@@ -230,7 +231,7 @@ object ConfigSerializerTest {
     }
 
     @Test
-    fun `test YAML legacy (mod v2)`() {
+    fun testLegacyYAML() = runBlocking {
         expectedLegacyConfigs.forEach { (version, expectedConfig) ->
             val yamlConfig = readResource("configs/$version.yml")
             val actualConfig = measureTimedValue { yamlSerializer.decode(yamlConfig) }
@@ -241,7 +242,7 @@ object ConfigSerializerTest {
     }
 
     @Test
-    fun `test JSON ancient (mod v1) + legacy (mod v2)`() {
+    fun testAncientLegacyJSON() = runBlocking {
         val jsonConfig = readResource("configs/v1.4.0+v2.1.0.json")
         val expectedConfig = ModConfig(
             onSneak = OnSneak(

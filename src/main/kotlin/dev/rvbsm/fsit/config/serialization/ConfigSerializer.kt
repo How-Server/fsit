@@ -4,6 +4,8 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.yamlMap
 import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.config.migrations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -22,20 +24,26 @@ import kotlin.io.path.writeText
 internal val configDirPath = FabricLoader.getInstance().configDir
 
 internal open class ConfigSerializer(private val format: StringFormat) : StringFormat by format {
-    fun encode(config: ModConfig): String = encodeToString(config)
-    fun decode(string: String): ModConfig = runCatching {
-        when (format) {
-            is Json -> format.decodeFromJsonElement(format.parseToJsonElement(string).jsonObject.let {
-                it.migrate(it.migrations)
-            })
+    suspend fun encode(config: ModConfig): String = withContext(Dispatchers.IO) {
+        encodeToString(config)
+    }
 
-            is Yaml -> format.decodeFromYamlNode(format.parseToYamlNode(string).yamlMap.let {
-                it.migrate(it.migrations)
-            })
+    suspend fun decode(string: String): ModConfig = withContext(Dispatchers.IO) {
+        runCatching {
+            when (format) {
+                is Json -> format.decodeWithMigrations(string)
+                is Yaml -> format.decodeWithMigrations(string)
 
-            else -> decodeFromString<ModConfig>(string)
-        }
-    }.getOrNull() ?: ModConfig()
+                else -> decodeFromString<ModConfig>(string)
+            }
+        }.getOrNull() ?: ModConfig()
+    }
+
+    private fun Json.decodeWithMigrations(string: String): ModConfig =
+        decodeFromJsonElement(parseToJsonElement(string).jsonObject.let { it.migrate(it.migrations) })
+
+    private fun Yaml.decodeWithMigrations(string: String): ModConfig =
+        decodeFromYamlNode(parseToYamlNode(string).yamlMap.let { it.migrate(it.migrations) })
 
     internal class Writable(
         format: StringFormat,
@@ -47,11 +55,18 @@ internal open class ConfigSerializer(private val format: StringFormat) : StringF
         private val configPath =
             configDirPath.find { it.name == id && fileExtensions.any(it.extension::equals) } ?: defaultPath
 
-        private fun readOrDefault(path: Path): ModConfig =
+        internal suspend fun write(config: ModConfig) {
+            withContext(Dispatchers.IO) {
+                config.path?.writeText(encode(config))
+            }
+        }
+
+        private suspend fun readOrDefault(path: Path) =
             if (path.exists() && path.fileSize() > 0) decode(path.readText())
             else ModConfig()
 
-        internal fun write(config: ModConfig) = config.path?.writeText(this.encode(config)) ?: Unit
-        internal fun read(): ModConfig = readOrDefault(configPath).copy(path = defaultPath).also { write(it) }
+        internal suspend fun read() = withContext(Dispatchers.IO) {
+            readOrDefault(configPath).copy(path = defaultPath).also { write(it) }
+        }
     }
 }

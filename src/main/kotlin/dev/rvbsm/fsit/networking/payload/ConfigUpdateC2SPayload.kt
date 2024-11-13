@@ -12,12 +12,16 @@ import net.minecraft.network.PacketByteBuf
 private val jsonConfigSerializer =
     ConfigSerializer(format = Json { ignoreUnknownKeys = true; namingStrategy = JsonNamingStrategy.SnakeCase })
 
-data class ConfigUpdateC2SPayload(val config: ModConfig) : CustomPayload<ConfigUpdateC2SPayload>(packetId) {
+data class ConfigUpdateC2SPayload(val serializedConfig: String) : CustomPayload<ConfigUpdateC2SPayload>(packetId) {
     override fun write(buf: PacketByteBuf) {
-        buf.writeString(jsonConfigSerializer.encode(config))
+        buf.writeString(serializedConfig)
     }
 
+    suspend fun decode() = jsonConfigSerializer.decode(serializedConfig)
+
     companion object : Id<ConfigUpdateC2SPayload>("config_sync", NetworkSide.SERVERBOUND) {
-        override fun init(buf: PacketByteBuf) = ConfigUpdateC2SPayload(jsonConfigSerializer.decode(buf.readString()))
+        override fun init(buf: PacketByteBuf) = ConfigUpdateC2SPayload(buf.readString())
+
+        suspend fun encode(config: ModConfig) = ConfigUpdateC2SPayload(jsonConfigSerializer.encode(config))
     }
 }

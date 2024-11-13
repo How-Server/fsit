@@ -14,7 +14,6 @@ import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.config.serialization.ConfigSerializer
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.event.ClientCommandSneakListener
-import dev.rvbsm.fsit.event.ServerStoppingListener
 import dev.rvbsm.fsit.event.SpawnSeatListener
 import dev.rvbsm.fsit.event.StartRidingListener
 import dev.rvbsm.fsit.event.UpdatePoseListener
@@ -30,7 +29,9 @@ import dev.rvbsm.fsit.networking.setPose
 import dev.rvbsm.fsit.util.id
 import dev.rvbsm.fsit.util.text.literal
 import dev.rvbsm.fsit.util.text.translatable
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
@@ -38,6 +39,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.command.ServerCommandSource
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.TimeSource
+
+@PublishedApi
+internal lateinit var modScope: CoroutineScope
+    private set
 
 val modTimeSource = TimeSource.Monotonic
 
@@ -56,8 +61,22 @@ object FSitMod : ModInitializer {
         ), id = MOD_ID, "yml", "yaml"
     )
 
-    override fun onInitialize() = runBlocking {
-        loadConfig()
+    @JvmStatic
+    fun id(path: String) = path.id(MOD_ID)
+
+    @JvmStatic
+    fun translatable(category: String, path: String, vararg args: Any) = "$category.$MOD_ID.$path".translatable(args)
+
+    private suspend fun loadConfig() {
+        config = yamlConfigSerializer.read()
+    }
+
+    suspend fun saveConfig() {
+        yamlConfigSerializer.write(config)
+    }
+
+    override fun onInitialize() {
+        runBlocking { loadConfig() }
 
         registerPayloads()
         registerEvents()
@@ -71,7 +90,9 @@ object FSitMod : ModInitializer {
     }
 
     private fun registerEvents() {
-        ServerLifecycleEvents.SERVER_STOPPING.register(ServerStoppingListener)
+        ServerLifecycleEvents.SERVER_STARTING.register {
+            modScope = CoroutineScope(it.asCoroutineDispatcher() + SupervisorJob())
+        }
 
         PassedUseEntityCallback.EVENT.register(StartRidingListener)
         PassedUseBlockCallback.EVENT.register(SpawnSeatListener)
@@ -115,15 +136,6 @@ object FSitMod : ModInitializer {
         poseCommand("sit", PlayerPose.Sitting)
         poseCommand("crawl", PlayerPose.Crawling)
     }
-
-    @JvmStatic
-    fun id(path: String) = path.id(MOD_ID)
-
-    @JvmStatic
-    fun translatable(category: String, path: String, vararg args: Any) = "$category.$MOD_ID.$path".translatable(args)
-
-    private suspend fun loadConfig() = coroutineScope { config = yamlConfigSerializer.read() }
-    fun saveConfig() = yamlConfigSerializer.write(config)
 }
 
 private inline fun <reified T> CommandBuilder<ServerCommandSource, *>.configArgument(
@@ -136,7 +148,7 @@ private inline fun <reified T> CommandBuilder<ServerCommandSource, *>.configArgu
     }
 
     argument<T>("value") {
-        executes {
+        executesSuspend {
             val property = propertyGetter()
             property.set(it()).also { FSitMod.saveConfig() }
             source.sendFeedback("Config option $name is now set to: ${property.get()}"::literal, true)

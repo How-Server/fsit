@@ -20,6 +20,7 @@ import dev.rvbsm.fsit.config.Sitting
 import dev.rvbsm.fsit.registry.RegistryIdentifier
 import dev.rvbsm.fsit.registry.toRegistrySet
 import dev.rvbsm.fsit.util.text.translatable
+import kotlinx.coroutines.launch
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 
@@ -130,7 +131,7 @@ object FSitModMenu : ModMenuApi {
                     }
                 }
 
-                save(FSitModClient::saveConfig)
+                save { modClientScope.launch { FSitModClient.saveConfig() } }
             }.generateScreen(screen)
         }
     }
