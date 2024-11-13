@@ -5,7 +5,7 @@ fabric-loom = "1.8-SNAPSHOT"
 fabric-loader = "0.16.9"
 fabric-kotlin = "1.12.3+kotlin.2.0.21"
 
-kaml = "0.61.0"
+kaml = "0.63.0"
 
 mod-publish = "0.7.4"
 shadow = "8.3.+"
