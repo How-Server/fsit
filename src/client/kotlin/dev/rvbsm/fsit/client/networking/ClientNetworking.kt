@@ -28,11 +28,11 @@ private typealias PlayPayloadHandler<P> =
         /*ClientPlayNetworking.PlayPayloadHandler<P>*/
 
 internal fun interface ClientPayloadHandler<P : CustomPayload<P>> : PlayPayloadHandler<P> {
-    fun P.receive(player: ClientPlayerEntity, responseSender: PacketSender)
+    fun P.handle(player: ClientPlayerEntity, responseSender: PacketSender)
 
     //? if <=1.20.4 {
     override fun receive(packet: P, player: ClientPlayerEntity, responseSender: PacketSender) =
-        packet.receive(player, responseSender)
+        packet.handle(player, responseSender)
     //?} else if >=1.20.5 {
     /*override fun receive(payload: P, context: ClientPlayNetworking.Context) =
         payload.receive(context.player(), context.responseSender())
