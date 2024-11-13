@@ -44,6 +44,6 @@ internal fun interface ServerPayloadHandler<P : CustomPayload<P>> : PlayPayloadH
         packet.handle(player, responseSender)
     //?} else if >=1.20.5 {
     /*override fun receive(payload: P, context: ServerPlayNetworking.Context) =
-        payload.receive(context.player(), context.responseSender())
+        payload.handle(context.player(), context.responseSender())
     *///?}
 }
