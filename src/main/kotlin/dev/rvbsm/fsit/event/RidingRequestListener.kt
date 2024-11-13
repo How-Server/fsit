@@ -2,79 +2,58 @@ package dev.rvbsm.fsit.event
 
 import dev.rvbsm.fsit.api.event.PassedUseEntityCallback
 import dev.rvbsm.fsit.entity.RideEntity
+import dev.rvbsm.fsit.modScope
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload
 import dev.rvbsm.fsit.networking.trySend
 import dev.rvbsm.fsit.util.xor
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.ActionResult
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
-private const val TIMEOUT = 5000L
-private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+private val requestTimeout = 5000.milliseconds
 private val requests = mutableMapOf<UUID, Channel<Boolean>>()
 
 internal val StartRidingListener = PassedUseEntityCallback interact@{ player, _, entity ->
-    if (entity !is ServerPlayerEntity) return@interact ActionResult.PASS
-
-    if (!player.canStartRiding(entity)) return@interact ActionResult.PASS
+    if (entity !is ServerPlayerEntity || !player.canStartRiding(entity)) return@interact ActionResult.PASS
 
     if (!player.config.onUse.riding || !entity.config.onUse.riding) return@interact ActionResult.PASS
     else if (!player.isInRange(entity, player.config.onUse.range.toDouble())) return@interact ActionResult.PASS
 
-    if (player.uuid xor entity.uuid !in requests) {
-        sendRidingRequests(player, entity)
+    requests.computeIfAbsent(player.uuid xor entity.uuid) { requestId ->
+        Channel<Boolean>(capacity = 2, onBufferOverflow = BufferOverflow.DROP_LATEST).also {
+            player.trySend(RidingRequestS2CPayload(entity.uuid))
+            entity.trySend(RidingRequestS2CPayload(player.uuid))
+
+            modScope.launch {
+                withTimeout(requestTimeout) {
+                    val response = it.receive() && it.receive()
+
+                    if (response && player.canStartRiding(entity)) {
+                        RideEntity.create(player, entity)
+                    }
+                }
+            }.invokeOnCompletion { requests -= requestId }
+        }
     }
 
     return@interact ActionResult.SUCCESS
 }
 
-internal val RidingServerStoppingEvent = ServerLifecycleEvents.ServerStopping {
-    val cancelException = CancellationException("Server stopping")
-    requests.forEach { it.value.cancel(cancelException) }
+internal fun RidingResponseC2SPayload.accept(player: ServerPlayerEntity) = modScope.launch {
+    requests[player.uuid xor uuid]?.send(response.isAccepted)
 }
-
-private fun sendRidingRequests(player: ServerPlayerEntity, target: ServerPlayerEntity) = scope.run {
-    val channel = Channel<Boolean>(capacity = 2)
-    requests[player.uuid xor target.uuid] = channel
-
-    player.trySend(RidingRequestS2CPayload(target.uuid)) { channel.trySend(true) }
-    target.trySend(RidingRequestS2CPayload(player.uuid)) { channel.trySend(true) }
-
-    launch {
-        player.startRiding(target, channel)
-    }.invokeOnCompletion { requests.remove(player.uuid xor target.uuid)?.close() }
-}
-
-private suspend fun ServerPlayerEntity.startRiding(target: ServerPlayerEntity, channel: ReceiveChannel<Boolean>) =
-    withTimeout(TIMEOUT) {
-        val result = channel.receive() to channel.receive()
-
-        if (result.first && isAlive && result.second && target.isAlive) {
-            ensureActive()
-
-            server.execute {
-                RideEntity.create(this@startRiding, target)
-            }
-        }
-    }
 
 private fun ServerPlayerEntity.shouldCancelRiding() = shouldCancelInteraction() || isSpectator || hasPassengers()
 
 private fun ServerPlayerEntity.canStartRiding(other: ServerPlayerEntity) =
-    this != other && uuid != other.uuid && !shouldCancelRiding() && !other.shouldCancelRiding()
-
-internal fun RidingResponseC2SPayload.completeRidingRequest(player: ServerPlayerEntity) {
-    requests[player.uuid xor uuid]?.trySend(response.isAccepted)
-}
+    this != other && uuid != other.uuid &&
+            !shouldCancelRiding() && !other.shouldCancelRiding() &&
+            config.onUse.riding && other.config.onUse.riding &&
+            isInRange(other, config.onUse.range.toDouble())

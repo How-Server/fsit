@@ -1,7 +1,7 @@
 package dev.rvbsm.fsit.networking
 
 import dev.rvbsm.fsit.entity.RideEntity
-import dev.rvbsm.fsit.event.completeRidingRequest
+import dev.rvbsm.fsit.event.accept
 import dev.rvbsm.fsit.modScope
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
 import dev.rvbsm.fsit.networking.payload.CustomPayload
@@ -27,7 +27,7 @@ internal val RidingResponseC2SHandler = ServerPayloadHandler<RidingResponseC2SPa
         player.removeAllPassengers()
     }
 
-    completeRidingRequest(player)
+    accept(player)
 }
 
 private typealias PlayPayloadHandler<P> =
