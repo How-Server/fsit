@@ -18,11 +18,13 @@ import dev.rvbsm.fsit.event.ServerStoppingListener
 import dev.rvbsm.fsit.event.SpawnSeatListener
 import dev.rvbsm.fsit.event.StartRidingListener
 import dev.rvbsm.fsit.event.UpdatePoseListener
+import dev.rvbsm.fsit.networking.ConfigUpdateC2SHandler
+import dev.rvbsm.fsit.networking.PoseRequestC2SHandler
+import dev.rvbsm.fsit.networking.RidingResponseC2SHandler
 import dev.rvbsm.fsit.networking.isInPose
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
 import dev.rvbsm.fsit.networking.payload.PoseRequestC2SPayload
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload
-import dev.rvbsm.fsit.networking.receive
 import dev.rvbsm.fsit.networking.resetPose
 import dev.rvbsm.fsit.networking.setPose
 import dev.rvbsm.fsit.util.id
@@ -63,12 +65,9 @@ object FSitMod : ModInitializer {
     }
 
     private fun registerPayloads() {
-        ServerPlayNetworking.registerGlobalReceiver(ConfigUpdateC2SPayload.packetId, ConfigUpdateC2SPayload::receive)
-        ServerPlayNetworking.registerGlobalReceiver(PoseRequestC2SPayload.packetId, PoseRequestC2SPayload::receive)
-        ServerPlayNetworking.registerGlobalReceiver(
-            RidingResponseC2SPayload.packetId,
-            RidingResponseC2SPayload::receive,
-        )
+        ServerPlayNetworking.registerGlobalReceiver(ConfigUpdateC2SPayload.packetId, ConfigUpdateC2SHandler)
+        ServerPlayNetworking.registerGlobalReceiver(PoseRequestC2SPayload.packetId, PoseRequestC2SHandler)
+        ServerPlayNetworking.registerGlobalReceiver(RidingResponseC2SPayload.packetId, RidingResponseC2SHandler)
     }
 
     private fun registerEvents() {

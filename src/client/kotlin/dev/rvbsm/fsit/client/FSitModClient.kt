@@ -7,7 +7,8 @@ import dev.rvbsm.fsit.client.config.RestrictionList
 import dev.rvbsm.fsit.client.event.ClientConnectionListener
 import dev.rvbsm.fsit.client.event.KeyBindingsListener
 import dev.rvbsm.fsit.client.event.poseKeybindings
-import dev.rvbsm.fsit.client.networking.receive
+import dev.rvbsm.fsit.client.networking.PoseUpdateS2CHandler
+import dev.rvbsm.fsit.client.networking.RidingRequestS2CHandler
 import dev.rvbsm.fsit.client.option.KeyBindingMode
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
 import dev.rvbsm.fsit.networking.payload.CustomPayload
@@ -73,8 +74,8 @@ object FSitModClient : ClientModInitializer {
     }
 
     private fun registerClientPayloads() {
-        ClientPlayNetworking.registerGlobalReceiver(PoseUpdateS2CPayload.packetId, PoseUpdateS2CPayload::receive)
-        ClientPlayNetworking.registerGlobalReceiver(RidingRequestS2CPayload.packetId, RidingRequestS2CPayload::receive)
+        ClientPlayNetworking.registerGlobalReceiver(PoseUpdateS2CPayload.packetId, PoseUpdateS2CHandler)
+        ClientPlayNetworking.registerGlobalReceiver(RidingRequestS2CPayload.packetId, RidingRequestS2CHandler)
     }
 
     private fun registerClientEvents() {
