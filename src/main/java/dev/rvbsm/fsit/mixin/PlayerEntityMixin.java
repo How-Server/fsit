@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import dev.rvbsm.fsit.api.entity.PoseableEntity;
 import dev.rvbsm.fsit.entity.PlayerPose;
 import net.minecraft.entity.player.PlayerAbilities;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntityMixin implements PoseableEntity {
@@ -21,12 +21,9 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin implements Pos
     @Shadow
     public abstract PlayerAbilities getAbilities();
 
-    @Shadow
-    public abstract boolean isSwimming();
-
-    @Redirect(method = "updatePose", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z"))
-    private boolean isCrawling(PlayerEntity player) {
-        return this.isSwimming() || this.fsit$isInPose(PlayerPose.Crawling);
+    @ModifyExpressionValue(method = "updatePose", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z"))
+    private boolean isCrawling(boolean isSwimming) {
+        return isSwimming || this.fsit$isInPose(PlayerPose.Crawling);
     }
 
     @Override
