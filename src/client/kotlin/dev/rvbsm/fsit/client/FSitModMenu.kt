@@ -113,7 +113,7 @@ object FSitModMenu : ModMenuApi {
                         binding(FSitMod.config.onSneak::sitting, defaultConfig.onSneak.sitting)
                         descriptionBuilder { addDefaultText() }
                     }
-                    val riding by rootOptions.registering {
+                    val crawling by rootOptions.registering {
                         controller = tickBox()
                         binding(FSitMod.config.onSneak::crawling, defaultConfig.onSneak.crawling)
                         descriptionBuilder { addDefaultText() }
