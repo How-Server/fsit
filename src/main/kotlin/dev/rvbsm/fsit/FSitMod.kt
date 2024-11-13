@@ -35,6 +35,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.command.ServerCommandSource
 import kotlin.reflect.KMutableProperty0
+import kotlin.time.TimeSource
+
+val modTimeSource = TimeSource.Monotonic
 
 object FSitMod : ModInitializer {
     const val MOD_ID = "fsit"

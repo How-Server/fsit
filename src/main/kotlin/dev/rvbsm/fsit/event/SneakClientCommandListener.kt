@@ -3,21 +3,18 @@ package dev.rvbsm.fsit.event
 import dev.rvbsm.fsit.api.event.ClientCommandCallback
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.entity.RideEntity
+import dev.rvbsm.fsit.modTimeSource
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.setPose
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.entity.EntityPose
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Direction
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeMark
 
-private val scope = CoroutineScope(Dispatchers.IO)
-private val sneaks = mutableMapOf<UUID, Job>()
+private val sneaks = mutableMapOf<UUID, TimeMark>()
 
 val ClientCommandSneakListener = ClientCommandCallback onClientCommand@{ player, mode ->
     if (mode == ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY && player.firstPassenger is RideEntity) {
@@ -29,18 +26,14 @@ val ClientCommandSneakListener = ClientCommandCallback onClientCommand@{ player,
     val config = player.config.onSneak.takeUnless { !it.sitting && !it.crawling } ?: return@onClientCommand
     if (player.pitch < config.minPitch) return@onClientCommand
 
-    if (player.uuid !in sneaks) {
-        sneaks[player.uuid] = scope.launch {
-            delay(config.delay)
-            sneaks.remove(player.uuid)
-        }
-    } else {
-        when {
-            config.crawling && player.isNearGap() -> player.setPose(PlayerPose.Crawling)
-            config.sitting -> player.setPose(PlayerPose.Sitting)
-        }
+    val sneakMark = sneaks.computeIfPresent(player.uuid) { _, mark ->
+        mark.takeUnless { it.elapsedNow() > config.delay.milliseconds }
+    }
 
-        sneaks.remove(player.uuid)?.cancel()
+    if (sneakMark == null) sneaks[player.uuid] = modTimeSource.markNow()
+    else if (sneakMark.elapsedNow() <= config.delay.milliseconds) when {
+        config.crawling && player.isNearGap() -> player.setPose(PlayerPose.Crawling)
+        config.sitting -> player.setPose(PlayerPose.Sitting)
     }
 }
 
