@@ -59,13 +59,13 @@ object FSitModMenu : ModMenuApi {
                         descriptionBuilder { addDefaultText() }
 
                         val sitMode by options.registering {
-                            controller = enumSwitch<KeyBindingMode> { Text.translatable(it.translationKey) }
+                            controller = enumSwitch<KeyBindingMode>()
                             binding(KeyBindingMode.Hybrid, FSitModClient.sitMode::getValue, FSitModClient.sitMode::setValue)
                             descriptionBuilder { addDefaultText() }
                         }
 
                         val crawlMode by options.registering {
-                            controller = enumSwitch<KeyBindingMode> { Text.translatable(it.translationKey) }
+                            controller = enumSwitch<KeyBindingMode>()
                             binding(KeyBindingMode.Hybrid, FSitModClient.crawlMode::getValue, FSitModClient.crawlMode::setValue)
                             descriptionBuilder { addDefaultText() }
                         }
