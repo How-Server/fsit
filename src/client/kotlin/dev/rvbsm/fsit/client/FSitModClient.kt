@@ -1,6 +1,5 @@
 package dev.rvbsm.fsit.client
 
-import com.mojang.serialization.Codec
 import dev.rvbsm.fsit.FSitMod
 import dev.rvbsm.fsit.client.command.command
 import dev.rvbsm.fsit.client.config.RestrictionList
@@ -10,6 +9,7 @@ import dev.rvbsm.fsit.client.event.poseKeybindings
 import dev.rvbsm.fsit.client.networking.PoseUpdateS2CHandler
 import dev.rvbsm.fsit.client.networking.RidingRequestS2CHandler
 import dev.rvbsm.fsit.client.option.KeyBindingMode
+import dev.rvbsm.fsit.client.option.enumOption
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
 import dev.rvbsm.fsit.networking.payload.CustomPayload
 import dev.rvbsm.fsit.networking.payload.PoseUpdateS2CPayload
@@ -20,7 +20,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.minecraft.client.option.SimpleOption
 import net.minecraft.command.argument.GameProfileArgumentType
 import net.minecraft.text.Text
 import java.util.UUID
@@ -31,28 +30,10 @@ object FSitModClient : ClientModInitializer {
     val isServerFSitCompatible get() = ClientPlayNetworking.canSend(ConfigUpdateC2SPayload.packetId)
 
     @JvmStatic
-    val sitMode = SimpleOption(
-        "key.fsit.sit",
-        SimpleOption.emptyTooltip(),
-        SimpleOption.enumValueText(),
-        SimpleOption.PotentialValuesBasedCallbacks(
-            KeyBindingMode.entries,
-            Codec.INT.xmap(KeyBindingMode::byId, KeyBindingMode::getId),
-        ),
-        KeyBindingMode.Hybrid,
-    ) {}
+    val sitMode = enumOption("key.fsit.sit", KeyBindingMode.Hybrid)
 
     @JvmStatic
-    val crawlMode = SimpleOption(
-        "key.fsit.crawl",
-        SimpleOption.emptyTooltip(),
-        SimpleOption.enumValueText(),
-        SimpleOption.PotentialValuesBasedCallbacks(
-            KeyBindingMode.entries,
-            Codec.INT.xmap(KeyBindingMode::byId, KeyBindingMode::getId),
-        ),
-        KeyBindingMode.Hybrid,
-    ) {}
+    val crawlMode = enumOption("key.fsit.crawl", KeyBindingMode.Hybrid)
 
     override fun onInitializeClient() {
         RestrictionList.load()

@@ -6,7 +6,6 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import kotlin.time.Duration
-import kotlin.time.TimeSource
 
 @Environment(EnvType.CLIENT)
 class HybridKeyBinding(

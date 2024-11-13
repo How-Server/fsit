@@ -8,14 +8,4 @@ enum class KeyBindingMode(private val translationKey: String) : TranslatableOpti
 
     override fun getId() = ordinal
     override fun getTranslationKey() = translationKey
-
-    companion object {
-        private val byId = ValueLists.createIdToValueFunction(
-            KeyBindingMode::getId,
-            enumValues<KeyBindingMode>(),
-            ValueLists.OutOfBoundsHandling.WRAP
-        )
-
-        fun byId(id: Int): KeyBindingMode = byId.apply(id)
-    }
 }
