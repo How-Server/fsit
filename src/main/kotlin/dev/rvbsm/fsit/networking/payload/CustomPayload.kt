@@ -17,19 +17,19 @@ private typealias PayloadId<P> =
         /*net.minecraft.network.packet.CustomPayload.Id<P>*/
 
 abstract class CustomPayload<P : CustomPayload<P>>(@JvmField val id: PayloadId<P>) : Payload {
-    /*? if <=1.20.4 {*/
+    //? if <=1.20.4 {
     override fun getType() = id
-    /*?} else if >=1.20.5 {*/
+    //?} else if >=1.20.5 {
     /*override fun getId() = id
     abstract fun write(buf: PacketByteBuf)
-    *//*?}*/
+    *///?}
 
     abstract class Id<P : CustomPayload<P>>(path: String, side: NetworkSide) {
         private val id = FSitMod.id(path)
 
         //? if <=1.20.4
         val packetId: PayloadId<P> = PayloadId.create(id, ::init)
-        /*? if >=1.20.5 {*/
+        //? if >=1.20.5 {
         /*private val registry = when(side) {
             NetworkSide.SERVERBOUND -> net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.playC2S()
             NetworkSide.CLIENTBOUND -> net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.playS2C()
@@ -41,7 +41,7 @@ abstract class CustomPayload<P : CustomPayload<P>>(@JvmField val id: PayloadId<P
         init {
             registry.register(packetId, packetCodec)
         }
-        *//*?}*/
+        *///?}
 
         internal abstract fun init(buf: PacketByteBuf): P
     }
