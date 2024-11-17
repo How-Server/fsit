@@ -14,12 +14,21 @@ plugins {
 }
 stonecutter active "1.20" /* [SC] DO NOT EDIT */
 
-stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
-    group = "project"
-    ofTask("build")
+tasks {
+    stonecutter registerChiseled register("chiseledBuild", stonecutter.chiseled) {
+        group = "project"
+        ofTask("build")
+    }
+
+    stonecutter registerChiseled register("chiseledPublish", stonecutter.chiseled) {
+        group = "project"
+        ofTask("publishMods")
+    }
 }
 
-stonecutter registerChiseled tasks.register("chiseledPublish", stonecutter.chiseled) {
-    group = "project"
-    ofTask("publishMods")
+val gitVersion by extra {
+    providers.exec {
+        executable = "git"
+        args = listOf("describe", "--tags", "--dirty", "--always")
+    }.standardOutput.asText.map { it.trim().drop(1) }.orNull
 }

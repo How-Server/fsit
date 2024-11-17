@@ -1,9 +1,5 @@
 import proguard.gradle.ProGuardTask
 
-buildscript {
-    dependencies.classpath("com.guardsquare:proguard-gradle:7.5.0")
-}
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.plugin.serialization)
@@ -13,7 +9,7 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-private val modVersion = "git describe --tags --dirty --always".runCommand()?.dropFirstIf('v')!!
+private val gitVersion: String by rootProject.ext
 private val minecraftProjectVersion = stonecutter.current.project
 private val minecraftTargetVersion = stonecutter.current.version
 private val isMinecraftVersionRange = stonecutter.eval(minecraftTargetVersion, ">$minecraftProjectVersion")
@@ -45,7 +41,7 @@ private class ModLibraries {
 
 private val modLibs = ModLibraries()
 
-version = "$modVersion+mc$minecraftProjectVersion"
+version = "$gitVersion+mc$minecraftProjectVersion"
 group = "dev.rvbsm"
 base.archivesName = rootProject.name
 
@@ -116,7 +112,7 @@ tasks {
     }
 
     jar {
-        from("LICENSE") {
+        from(rootProject.file("LICENSE")) {
             rename { "${it}_${rootProject.name}" }
         }
     }
@@ -205,11 +201,11 @@ publishMods {
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = providers.environmentVariable("CHANGELOG").orElse("No changelog provided.")
     type = when {
-        "alpha" in modVersion -> ALPHA
-        "beta" in modVersion -> BETA
+        "alpha" in gitVersion -> ALPHA
+        "beta" in gitVersion -> BETA
         else -> STABLE
     }
-    displayName = "[$minecraftProjectVersion] v$modVersion"
+    displayName = "[$minecraftProjectVersion] v$gitVersion"
     modLoaders.addAll("fabric", "quilt")
 
     dryRun = !providers.environmentVariable("MODRINTH_TOKEN").isPresent
