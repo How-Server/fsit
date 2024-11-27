@@ -1,14 +1,13 @@
 package dev.rvbsm.fsit.entity
 
+import dev.rvbsm.fsit.util.math.toHorizontalDirection
 import net.minecraft.entity.Dismounting.canDismountInBlock
 import net.minecraft.entity.Dismounting.canPlaceEntityAt
 import net.minecraft.entity.Dismounting.getDismountOffsets
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
-import kotlin.time.measureTimedValue
 
 /**
  * @see net.minecraft.entity.vehicle.AbstractMinecartEntity.updatePassengerForDismount
@@ -18,7 +17,7 @@ fun getDismountPosition(vehicle: Entity, passenger: LivingEntity): Vec3d {
     val world = vehicle.world
     val vehiclePos = vehicle.pos
 
-    val dismountOffsets = getDismountOffsets(Direction.fromRotation(passenger.yaw.toDouble()))
+    val dismountOffsets = getDismountOffsets(passenger.yaw.toHorizontalDirection())
     for ((xOffset, zOffset) in sequenceOf(intArrayOf(0, 0), *dismountOffsets)) {
         val dismountPos = vehiclePos.add(xOffset.toDouble(), 0.0, zOffset.toDouble()).let { dismountPos ->
             world.getDismountHeight(BlockPos.ofFloored(dismountPos)).takeIf(::canDismountInBlock)

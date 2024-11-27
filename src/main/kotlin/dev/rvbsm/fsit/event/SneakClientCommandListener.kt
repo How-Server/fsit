@@ -6,10 +6,10 @@ import dev.rvbsm.fsit.entity.RideEntity
 import dev.rvbsm.fsit.modTimeSource
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.setPose
+import dev.rvbsm.fsit.util.math.toHorizontalDirection
 import net.minecraft.entity.EntityPose
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.Direction
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeMark
@@ -42,14 +42,14 @@ private fun ServerPlayerEntity.isNearGap(): Boolean {
     val crouchingDimensions = this.getDimensions(EntityPose.CROUCHING)
 
     val expectEmptyAt = pos.add(
-        Direction.fromRotation(yaw.toDouble()).offsetX * 0.1,
+        yaw.toHorizontalDirection().offsetX * 0.1,
         0.0,
-        Direction.fromRotation(yaw.toDouble()).offsetZ * 0.1,
+        yaw.toHorizontalDirection().offsetZ * 0.1,
     )
     val expectFullAt = pos.add(
-        Direction.fromRotation(yaw.toDouble()).offsetX * 0.1,
+        yaw.toHorizontalDirection().offsetX * 0.1,
         crouchingDimensions.height.toDouble(),
-        Direction.fromRotation(yaw.toDouble()).offsetZ * 0.1,
+        yaw.toHorizontalDirection().offsetZ * 0.1,
     )
 
     return world.isSpaceEmpty(this, crawlingDimensions.getBoxAt(expectEmptyAt).contract(1.0e-6)) &&
