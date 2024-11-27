@@ -1,6 +1,6 @@
 package dev.rvbsm.fsit.client.networking
 
-import dev.rvbsm.fsit.client.config.RestrictionList
+import dev.rvbsm.fsit.client.FSitModClient
 import dev.rvbsm.fsit.client.event.untoggleKeyBindings
 import dev.rvbsm.fsit.networking.payload.CustomPayload
 import dev.rvbsm.fsit.networking.payload.PoseUpdateS2CPayload
@@ -18,7 +18,7 @@ internal val PoseUpdateS2CHandler = ClientPayloadHandler<PoseUpdateS2CPayload> {
 }
 
 internal val RidingRequestS2CHandler = ClientPayloadHandler<RidingRequestS2CPayload> { _, responseSender ->
-    responseSender.sendPacket(RidingResponseC2SPayload(uuid, !RestrictionList.isRestricted(uuid)))
+    responseSender.sendPacket(RidingResponseC2SPayload(uuid, !FSitModClient.isRestricted(uuid)))
 }
 
 private typealias PlayPayloadHandler<P> =

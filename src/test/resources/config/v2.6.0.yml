@@ -1,0 +1,19 @@
+version: 2
+use_server: true
+sitting:
+  behaviour: "nothing"
+  should_center: true
+on_use:
+  sitting: false
+  riding: false
+  range: 1
+  check_suffocation: false
+  blocks:
+    - "amethyst_block"
+    - "#beds"
+    - "#stairs"
+on_sneak:
+  sitting: false
+  crawling: false
+  min_pitch: 42.0
+  delay: 999

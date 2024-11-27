@@ -2,7 +2,6 @@ package dev.rvbsm.fsit.mixin.client;
 
 import dev.rvbsm.fsit.FSitMod;
 import dev.rvbsm.fsit.client.FSitModClient;
-import dev.rvbsm.fsit.client.config.RestrictionList;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.multiplayer.SocialInteractionsPlayerListEntry;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -66,7 +65,7 @@ public abstract class SocialInteractionsPlayerListEntryMixin extends ElementList
             this.allowButton.setTooltip(Tooltip.of(this.allowButton.active ? ALLOW_BUTTON : DISABLED_BUTTON));
 
             buttons.add(this.restrictButton);
-            updateButtons(RestrictionList.isRestricted(uuid));
+            updateButtons(FSitModClient.isRestricted(uuid));
         }
     }
 
@@ -93,13 +92,13 @@ public abstract class SocialInteractionsPlayerListEntryMixin extends ElementList
 
     @Unique
     private void restrict(ButtonWidget button) {
-        RestrictionList.add(uuid);
+        FSitModClient.restrictInteractionsFor(uuid);
         this.updateButtons(true);
     }
 
     @Unique
     private void allow(ButtonWidget button) {
-        RestrictionList.remove(uuid);
+        FSitModClient.allowInteractionsFor(uuid);
         this.updateButtons(false);
     }
 }

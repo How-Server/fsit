@@ -4,19 +4,19 @@ import com.charleskorn.kaml.YamlComment
 import dev.rvbsm.fsit.registry.RegistrySet
 import dev.rvbsm.fsit.registry.registrySetOf
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import net.minecraft.block.Block
 import net.minecraft.registry.tag.BlockTags
-import java.nio.file.Path
 
-internal const val CURRENT_VERSION = 2
+private const val CURRENT_VERSION = 2
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class ModConfig(
-    @Transient internal val path: Path? = null,
-    internal val version: Int = CURRENT_VERSION,
+    @EncodeDefault internal val version: Int = CURRENT_VERSION,
 
     // todo: show on the client somehow that server's `use_server` is true
     @YamlComment("Whether to use the server-side configuration.")
@@ -79,3 +79,5 @@ data class OnSneak(
     @YamlComment("The window between sneaks to sit down (in milliseconds).")
     var delay: Long = 600,
 )
+
+fun Result<ModConfig>.getOrDefault() = getOrDefault(ModConfig())

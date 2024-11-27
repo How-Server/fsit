@@ -2,7 +2,7 @@ import proguard.gradle.ProGuardTask
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.fabric.loom)
     alias(libs.plugins.publish)
@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.kaml)
     shadow(libs.kaml)
 
+    testImplementation(libs.bundles.junit.jupiter)
     testImplementation(libs.fabric.loader.junit)
     testImplementation(libs.kotlin.test)
 }

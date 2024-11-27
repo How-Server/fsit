@@ -1,7 +1,5 @@
 package dev.rvbsm.fsit
 
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.YamlNamingStrategy
 import dev.rvbsm.fsit.api.event.ClientCommandCallback
 import dev.rvbsm.fsit.api.event.PassedUseBlockCallback
@@ -11,7 +9,15 @@ import dev.rvbsm.fsit.command.CommandBuilder
 import dev.rvbsm.fsit.command.command
 import dev.rvbsm.fsit.command.isGameMaster
 import dev.rvbsm.fsit.config.ModConfig
-import dev.rvbsm.fsit.config.serialization.ConfigSerializer
+import dev.rvbsm.fsit.config.configSchemas
+import dev.rvbsm.fsit.config.getOrDefault
+import dev.rvbsm.fsit.config.migration.version
+import dev.rvbsm.fsit.config.migration.withMigration
+import dev.rvbsm.fsit.config.serialization.UUIDSerializer
+import dev.rvbsm.fsit.config.serialization.Yaml
+import dev.rvbsm.fsit.config.serialization.asReader
+import dev.rvbsm.fsit.config.serialization.asSerializer
+import dev.rvbsm.fsit.config.serialization.withDefault
 import dev.rvbsm.fsit.entity.PlayerPose
 import dev.rvbsm.fsit.event.ClientCommandSneakListener
 import dev.rvbsm.fsit.event.SpawnSeatListener
@@ -33,12 +39,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
+import kotlinx.serialization.modules.plus
+import kotlinx.serialization.modules.serializersModuleOf
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.command.ServerCommandSource
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.TimeSource
+
+@PublishedApi
+internal val modLogger: Logger = LoggerFactory.getLogger(FSitMod::class.java)
 
 @PublishedApi
 internal lateinit var modScope: CoroutineScope
@@ -46,20 +63,36 @@ internal lateinit var modScope: CoroutineScope
 
 val modTimeSource = TimeSource.Monotonic
 
+@OptIn(ExperimentalSerializationApi::class)
+@Suppress("json_format_redundant")
+val jsonSerializer = Json {
+    ignoreUnknownKeys = true
+    namingStrategy = JsonNamingStrategy.SnakeCase
+
+    serializersModule += serializersModuleOf(UUIDSerializer)
+
+    withMigration<ModConfig>(configSchemas) { if ("config_version" in this) -1 else version }
+    withDefault(::ModConfig)
+}.asSerializer()
+
+val yamlSerializer = Yaml {
+    strictMode = false
+    yamlNamingStrategy = YamlNamingStrategy.SnakeCase
+
+    serializersModule += serializersModuleOf(UUIDSerializer)
+
+    withMigration<ModConfig>(configSchemas)
+    withDefault(::ModConfig)
+}.asSerializer()
+
 object FSitMod : ModInitializer {
     const val MOD_ID = "fsit"
 
+    private val configReader =
+        yamlSerializer.asReader(FabricLoader.getInstance().configDir, MOD_ID, "yml", "yaml", writeToFile = true)
+
     @JvmStatic
     lateinit var config: ModConfig private set
-
-    private val yamlConfigSerializer = ConfigSerializer.Writable(
-        format = Yaml(
-            configuration = YamlConfiguration(
-                strictMode = false,
-                yamlNamingStrategy = YamlNamingStrategy.SnakeCase,
-            ),
-        ), id = MOD_ID, "yml", "yaml"
-    )
 
     @JvmStatic
     fun id(path: String) = path.id(MOD_ID)
@@ -68,11 +101,11 @@ object FSitMod : ModInitializer {
     fun translatable(category: String, path: String, vararg args: Any) = "$category.$MOD_ID.$path".translatable(args)
 
     private suspend fun loadConfig() {
-        config = yamlConfigSerializer.read()
+        config = configReader.read<ModConfig>().getOrDefault()
     }
 
     suspend fun saveConfig() {
-        yamlConfigSerializer.write(config)
+        configReader.write(config)
     }
 
     override fun onInitialize() {
