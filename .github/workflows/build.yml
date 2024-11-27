@@ -29,21 +29,6 @@ jobs:
             **/build/test-results/
       - uses: actions/upload-artifact@v4
         with:
-          name: "1.20"
-          path: build/libs/*+mc1.20.jar
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "1.20.2"
-          path: build/libs/*+mc1.20.2.jar
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "1.20.5"
-          path: build/libs/*+mc1.20.5.jar
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "1.21"
-          path: build/libs/*+mc1.21.jar
+          name: "fsit artifacts"
+          path: build/libs/*.jar
           if-no-files-found: error
