@@ -19,7 +19,7 @@ class CrawlEntity(private val player: ServerPlayerEntity) : ShulkerEntity(Entity
     private val positionSyncPayload get() =
         //? if <=1.21.1
         net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket(this)
-        //? if >=1.21.2-alpha.0
+        //? if >=1.21.2
         /*net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket.create(this)*/
 
     init {

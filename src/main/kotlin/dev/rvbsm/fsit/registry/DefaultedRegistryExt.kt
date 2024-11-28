@@ -4,7 +4,7 @@ import net.minecraft.item.ItemConvertible
 import net.minecraft.registry.DefaultedRegistry
 import kotlin.streams.asSequence
 
-//? if >=1.21.2-alpha.0
+//? if >=1.21.2
 /*private val net.minecraft.registry.entry.RegistryEntryList.Named<*>.id get() = tag.id*/
 
 fun DefaultedRegistry<*>.matchingIdentifiers(value: String): Sequence<RegistryIdentifier> {
@@ -47,7 +47,7 @@ fun <T> DefaultedRegistry<T>.find(id: RegistryIdentifier): T {
 
         //? if <=1.21.1
         getEntryList(tag).orElse(null)?.firstOrNull()?.value() ?: this[defaultId]
-        //? if >=1.21.2-alpha.0
+        //? if >=1.21.2
         /*tag.firstOrNull()?.value() ?: this[defaultId]*/
     } else this[id.id]
 }
