@@ -9,6 +9,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.StringFormat
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
 interface DataSerializer<SerialType> : SerialFormat {
@@ -46,16 +47,13 @@ class BinaryDataSerializer<F : BinaryFormat>(format: F) : DataSerializer<ByteArr
         decodeFromByteArray(deserializer, serializedData)
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 suspend inline fun <reified T : Any, S> DataSerializer<S>.encode(data: T): Result<S> =
-    encode(serializersModule.getContextual(T::class) ?: serializersModule.serializer<T>(), data)
+    encode(serializersModule.preferContextual<T>(), data)
 
-@OptIn(ExperimentalSerializationApi::class)
 suspend inline fun <reified T : Any, S> DataSerializer<S>.decode(serializedData: S): Result<T> =
-    decode(serializersModule.getContextual(T::class) ?: serializersModule.serializer<T>(), serializedData)
+    decode(serializersModule.preferContextual<T>(), serializedData)
 
-suspend inline fun <reified T : Any> StringDataSerializer<*>.encode(data: T): Result<String> =
-    encode<T, String>(data)
+suspend inline fun <reified T : Any> StringDataSerializer<*>.encode(data: T): Result<String> = encode<T, String>(data)
 
 suspend inline fun <reified T : Any> StringDataSerializer<*>.decode(serializedData: String): Result<T> =
     decode<T, String>(serializedData)
@@ -67,4 +65,8 @@ suspend inline fun <reified T : Any> BinaryDataSerializer<*>.decode(serializedDa
     decode<T, ByteArray>(serializedData)
 
 fun <F : StringFormat> F.asSerializer() = StringDataSerializer(this)
-fun <F: BinaryFormat> F.asSerializer() = BinaryDataSerializer(this)
+fun <F : BinaryFormat> F.asSerializer() = BinaryDataSerializer(this)
+
+@PublishedApi
+@OptIn(ExperimentalSerializationApi::class)
+internal inline fun <reified T : Any> SerializersModule.preferContextual() = getContextual(T::class) ?: serializer<T>()

@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit
 
+import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlNamingStrategy
 import dev.rvbsm.fsit.api.event.ClientCommandCallback
 import dev.rvbsm.fsit.api.event.PassedUseBlockCallback
@@ -88,8 +89,9 @@ val yamlSerializer = Yaml {
 object FSitMod : ModInitializer {
     const val MOD_ID = "fsit"
 
-    private val configReader =
-        yamlSerializer.asReader(FabricLoader.getInstance().configDir, MOD_ID, "yml", "yaml", writeToFile = true)
+    private val configReader = yamlSerializer.asReader<Yaml, ModConfig>(
+        FabricLoader.getInstance().configDir, MOD_ID, "yml", "yaml", writeToFile = true
+    )
 
     @JvmStatic
     lateinit var config: ModConfig private set
@@ -101,7 +103,7 @@ object FSitMod : ModInitializer {
     fun translatable(category: String, path: String, vararg args: Any) = "$category.$MOD_ID.$path".translatable(args)
 
     private suspend fun loadConfig() {
-        config = configReader.read<ModConfig>().getOrDefault()
+        config = configReader.read().getOrDefault()
     }
 
     suspend fun saveConfig() {

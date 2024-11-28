@@ -4,6 +4,7 @@ import dev.rvbsm.fsit.modLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.BinaryFormat
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import java.nio.file.Path
 import kotlin.io.path.extension
@@ -15,8 +16,9 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 
-abstract class DataReader<Serial>(
+abstract class DataReader<T : Any, Serial>(
     dataSerializer: DataSerializer<Serial>,
+    private val tSerializer: KSerializer<T>,
     private val directory: Path,
     private val id: String,
     private vararg val fileExtensions: String,
@@ -35,46 +37,65 @@ abstract class DataReader<Serial>(
     @PublishedApi
     internal fun Path.canRead() = isReadable() && fileSize() > 0
 
-    // todo: hm, this should not be generic at all
-    suspend inline fun <reified T : Any> read(): Result<T> = withContext(Dispatchers.IO) {
+    suspend fun read(): Result<T> = withContext(Dispatchers.IO) {
         runCatching {
-            decode<T, Serial>(configPath.read()).getOrThrow()
+            decode(tSerializer, configPath.read()).getOrThrow()
         }.onFailure { modLogger.error("Failed to read from {}", configPath, it) }.onSuccess { write(it) }
     }
 
-    suspend inline fun <reified T : Any> write(data: T) = withContext(Dispatchers.IO) {
+    suspend fun write(data: T) = withContext(Dispatchers.IO) {
         if (writeToFile) runCatching {
-            configPath.write(encode<T, Serial>(data).getOrThrow())
+            configPath.write(encode(tSerializer, data).getOrThrow())
         }.onFailure { modLogger.error("Failed to write {} to {}", data, configPath, it) }
     }
 }
 
-class StringDataReader<F : StringFormat>(
+class StringDataReader<F : StringFormat, T : Any>(
     dataSerializer: StringDataSerializer<F>,
+    tSerializer: KSerializer<T>,
     directory: Path, id: String, vararg fileExtensions: String,
     writeToFile: Boolean,
-) : DataReader<String>(dataSerializer, directory, id, *fileExtensions, writeToFile = writeToFile) {
+) : DataReader<T, String>(dataSerializer, tSerializer, directory, id, *fileExtensions, writeToFile = writeToFile) {
 
     override fun Path.read() = readText()
     override fun Path.write(serializedData: String) = writeText(serializedData)
 }
 
-class BinaryDataReader<F : BinaryFormat>(
+class BinaryDataReader<F : BinaryFormat, T : Any>(
     dataSerializer: BinaryDataSerializer<F>,
+    tSerializer: KSerializer<T>,
     directory: Path, id: String, vararg fileExtensions: String,
     writeToFile: Boolean,
-) : DataReader<ByteArray>(dataSerializer, directory, id, *fileExtensions, writeToFile = writeToFile) {
+) : DataReader<T, ByteArray>(dataSerializer, tSerializer, directory, id, *fileExtensions, writeToFile = writeToFile) {
 
     override fun Path.read() = readBytes()
     override fun Path.write(serializedData: ByteArray) = writeBytes(serializedData)
 }
 
-fun <F : StringFormat> F.asReader(
+inline fun <F : StringFormat, reified T : Any> StringDataSerializer<F>.asReader(
     directory: Path, id: String, vararg fileExtensions: String,
     writeToFile: Boolean = false,
-) = StringDataReader(asSerializer(), directory, id, *fileExtensions, writeToFile = writeToFile)
+) = StringDataReader(
+    this, serializersModule.preferContextual<T>(),
+    directory, id, *fileExtensions,
+    writeToFile = writeToFile,
+)
 
-fun <F : BinaryFormat> F.asReader(
+inline fun <F : BinaryFormat, reified T : Any> BinaryDataSerializer<F>.asReader(
     directory: Path, id: String, vararg fileExtensions: String,
     writeToFile: Boolean = false,
-) = BinaryDataReader(asSerializer(), directory, id, *fileExtensions, writeToFile = writeToFile)
+) = BinaryDataReader(
+    this, serializersModule.preferContextual<T>(),
+    directory, id, *fileExtensions,
+    writeToFile = writeToFile,
+)
+
+inline fun <F : StringFormat, reified T : Any> F.asReader(
+    directory: Path, id: String, vararg fileExtensions: String,
+    writeToFile: Boolean = false,
+) = asSerializer().asReader<F, T>(directory, id, *fileExtensions, writeToFile = writeToFile)
+
+inline fun <F : BinaryFormat, reified T : Any> F.asReader(
+    directory: Path, id: String, vararg fileExtensions: String,
+    writeToFile: Boolean = false,
+) = asSerializer().asReader<F, T>(directory, id, *fileExtensions, writeToFile = writeToFile)

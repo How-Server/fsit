@@ -10,14 +10,13 @@ import com.charleskorn.kaml.YamlPath
 import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.YamlTaggedNode
 import dev.rvbsm.fsit.config.serialization.YamlBuilder
-import kotlinx.serialization.ExperimentalSerializationApi
+import dev.rvbsm.fsit.config.serialization.preferContextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.overwriteWith
 import kotlinx.serialization.modules.serializersModuleOf
-import kotlinx.serialization.serializer
 
 class YamlProcessor(override val target: YamlMap) : MigrationProcessor<YamlNode> {
     override fun YamlNode.toMutable(): MutableNode = when (this) {
@@ -88,17 +87,11 @@ class YamlMigrationSerializer<T : Any>(
 
 val YamlMap.version get() = runCatching { getScalar("version")?.toInt() }.getOrNull() ?: 0
 
-@OptIn(ExperimentalSerializationApi::class)
 inline fun <reified T : Any> YamlBuilder.withMigration(
     schemas: Iterable<MigrationSchema>,
     noinline versionProvider: YamlMap.() -> Int = YamlMap::version,
 ) {
     serializersModule = serializersModule.overwriteWith(
-        serializersModuleOf(
-            YamlMigrationSerializer(
-                serializersModule.getContextual(T::class) ?: serializersModule.serializer<T>(),
-                schemas, versionProvider,
-            )
-        )
+        serializersModuleOf(YamlMigrationSerializer(serializersModule.preferContextual<T>(), schemas, versionProvider))
     )
 }

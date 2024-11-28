@@ -12,17 +12,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.overwriteWith
 import kotlinx.serialization.modules.serializersModuleOf
-import kotlinx.serialization.serializer
 
-@OptIn(ExperimentalSerializationApi::class)
 inline fun <reified T : Any> YamlBuilder.withDefault(noinline defaultProvider: () -> T) {
     serializersModule = serializersModule.overwriteWith(
-        serializersModuleOf(
-            DefaultedSerializer(
-                serializersModule.getContextual(T::class) ?: serializersModule.serializer<T>(),
-                defaultProvider,
-            )
-        )
+        serializersModuleOf(DefaultedSerializer(serializersModule.preferContextual<T>(), defaultProvider))
     )
 }
 

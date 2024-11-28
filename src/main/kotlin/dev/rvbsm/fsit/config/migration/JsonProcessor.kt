@@ -1,6 +1,6 @@
 package dev.rvbsm.fsit.config.migration
 
-import kotlinx.serialization.ExperimentalSerializationApi
+import dev.rvbsm.fsit.config.serialization.preferContextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonBuilder
@@ -13,7 +13,6 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.modules.overwriteWith
 import kotlinx.serialization.modules.serializersModuleOf
-import kotlinx.serialization.serializer
 
 class JsonProcessor(override val target: JsonObject) : MigrationProcessor<JsonElement> {
     override fun JsonElement.toMutable(): MutableNode = when (this) {
@@ -54,17 +53,11 @@ class JsonMigrationSerializer<T : Any>(
 
 val JsonObject.version get() = get("version")?.runCatching { jsonPrimitive.intOrNull }?.getOrNull() ?: 0
 
-@OptIn(ExperimentalSerializationApi::class)
 inline fun <reified T : Any> JsonBuilder.withMigration(
     schemas: Iterable<MigrationSchema>,
     noinline versionProvider: JsonObject.() -> Int = JsonObject::version,
 ) {
     serializersModule = serializersModule.overwriteWith(
-        serializersModuleOf(
-            JsonMigrationSerializer(
-                serializersModule.getContextual(T::class) ?: serializersModule.serializer<T>(),
-                schemas, versionProvider,
-            )
-        )
+        serializersModuleOf(JsonMigrationSerializer(serializersModule.preferContextual<T>(), schemas, versionProvider))
     )
 }

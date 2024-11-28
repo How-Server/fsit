@@ -23,6 +23,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -45,8 +46,9 @@ private val alreadyRestrictedException =
 private val alreadyAllowedException =
     SimpleCommandExceptionType("Nothing changed. The player isn't restricted".literal())
 
-private val restrictionsReader =
-    jsonSerializer.asReader(FabricLoader.getInstance().configDir, "$MOD_ID.restrictions", "json", writeToFile = true)
+private val restrictionsReader = jsonSerializer.asReader<Json, RestrictionSet>(
+    FabricLoader.getInstance().configDir, "$MOD_ID.restrictions", "json", writeToFile = true
+)
 
 object FSitModClient : ClientModInitializer {
 
@@ -93,7 +95,7 @@ object FSitModClient : ClientModInitializer {
     }
 
     private suspend fun loadRestrictions() {
-        socialRestrictions = restrictionsReader.read<RestrictionSet>().getOrDefault(mutableSetOf())
+        socialRestrictions = restrictionsReader.read().getOrDefault(mutableSetOf())
     }
 
     private suspend fun saveRestrictions() {
