@@ -28,8 +28,8 @@ internal val StartRidingListener = PassedUseEntityCallback interact@{ player, _,
 
     requests.computeIfAbsent(player.uuid xor entity.uuid) { requestId ->
         Channel<Boolean>(capacity = 2, onBufferOverflow = BufferOverflow.DROP_LATEST).also {
-            player.trySend(RidingRequestS2CPayload(entity.uuid))
-            entity.trySend(RidingRequestS2CPayload(player.uuid))
+            player.trySend(RidingRequestS2CPayload(entity.uuid)) { it.trySend(true) }
+            entity.trySend(RidingRequestS2CPayload(player.uuid)) { it.trySend(true) }
 
             modScope.launch {
                 withTimeout(requestTimeout) {
