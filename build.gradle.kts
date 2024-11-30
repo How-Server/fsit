@@ -67,7 +67,7 @@ dependencies {
         "fabric-screen-api-v1", // bruh
     ).map { fabricApi.module(it, property("fabric.api").toString()) }.forEach(::modImplementation)
 
-    modApi("com.terraformersmc:modmenu:${property("api.modmenu")}")
+    modImplementation("com.terraformersmc:modmenu:${property("api.modmenu")}")
     modImplementation("dev.isxander:yet-another-config-lib:${property("api.yacl")}-fabric") {
         exclude("net.fabricmc.fabric-api", "fabric-api")
     }
