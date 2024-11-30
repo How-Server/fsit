@@ -5,9 +5,9 @@ import net.minecraft.network.NetworkSide
 import net.minecraft.network.PacketByteBuf
 import java.util.UUID
 
-data class RidingResponseC2SPayload(val uuid: UUID, val response: ResponseType) :
+data class RidingResponseC2SPayload(val uuid: UUID, val response: Response) :
     CustomPayload<RidingResponseC2SPayload>(packetId) {
-    constructor(uuid: UUID, isAccepted: Boolean) : this(uuid, ResponseType.valueOf(isAccepted))
+    constructor(uuid: UUID, isAccepted: Boolean) : this(uuid, Response.valueOf(isAccepted))
 
     override fun write(buf: PacketByteBuf) {
         buf.writeUuid(uuid)
@@ -16,16 +16,14 @@ data class RidingResponseC2SPayload(val uuid: UUID, val response: ResponseType) 
 
     companion object : Id<RidingResponseC2SPayload>("riding_response", NetworkSide.SERVERBOUND) {
         override fun init(buf: PacketByteBuf) =
-            RidingResponseC2SPayload(buf.readUuid(), buf.readEnumConstant<ResponseType>())
+            RidingResponseC2SPayload(buf.readUuid(), buf.readEnumConstant<Response>())
     }
 
-    enum class ResponseType(val isAccepted: Boolean) {
+    enum class Response(val isAccepted: Boolean) {
         Accept(true), Refuse(false);
 
         companion object {
-            fun valueOf(isAccepted: Boolean): ResponseType {
-                return if (isAccepted) Accept else Refuse
-            }
+            fun valueOf(isAccepted: Boolean) = if (isAccepted) Accept else Refuse
         }
     }
 }

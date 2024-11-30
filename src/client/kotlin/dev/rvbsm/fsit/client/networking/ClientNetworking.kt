@@ -18,7 +18,7 @@ internal val PoseUpdateS2CHandler = ClientPayloadHandler<PoseUpdateS2CPayload> {
 }
 
 internal val RidingRequestS2CHandler = ClientPayloadHandler<RidingRequestS2CPayload> { _, responseSender ->
-    responseSender.sendPacket(RidingResponseC2SPayload(uuid, !FSitModClient.isRestricted(uuid)))
+    responseSender.sendPacket(RidingResponseC2SPayload(playerUUID, !FSitModClient.isRestricted(playerUUID)))
 }
 
 private typealias PlayPayloadHandler<P> =

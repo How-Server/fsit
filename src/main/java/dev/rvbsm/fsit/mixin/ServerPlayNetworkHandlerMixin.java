@@ -5,11 +5,14 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import dev.rvbsm.fsit.api.event.ClientCommandCallback;
 import dev.rvbsm.fsit.api.event.PassedUseBlockCallback;
 import dev.rvbsm.fsit.api.event.PassedUseEntityCallback;
+import dev.rvbsm.fsit.api.network.RidingRequestHandler;
+import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -17,20 +20,38 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 @Mixin(ServerPlayNetworkHandler.class)
-public abstract class ServerPlayNetworkHandlerMixin {
+public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHandler {
 
     @Shadow
     public ServerPlayerEntity player;
 
+    @Unique
+    private final Map<UUID, CompletableFuture<Boolean>> ridingRequests = new LinkedHashMap<>();
+
     @Inject(method = "onClientCommand", at = @At("TAIL"))
     public void onClientCommand(@NotNull ClientCommandC2SPacket packet, CallbackInfo ci) {
         ClientCommandCallback.EVENT.invoker().onClientMode(this.player, packet.getMode());
+    }
+
+    @Inject(method = "onDisconnected", at = @At("TAIL"))
+    public void purgeRidingRequests(Text reason, CallbackInfo ci) {
+        for (UUID uuid : this.ridingRequests.keySet()) {
+            this.ridingRequests.remove(uuid).complete(false);
+        }
     }
 
     @ModifyVariable(method = "onPlayerInteractBlock", at = @At("STORE"))
@@ -42,6 +63,23 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
 
         return interactionActionResult;
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> fsit$sendRidingRequest(@NotNull UUID playerUUID, @NotNull Duration timeout) {
+        return this.ridingRequests.compute(playerUUID, (uuid, future) -> {
+            if (future != null && !future.isDone()) return CompletableFuture.completedFuture(false);
+
+            return new CompletableFuture<Boolean>().completeOnTimeout(false, timeout.toMillis(), TimeUnit.MILLISECONDS);
+        });
+    }
+
+    @Override
+    public void fsit$receiveRidingResponse(@NotNull RidingResponseC2SPayload response) {
+        final CompletableFuture<Boolean> future = this.ridingRequests.remove(response.getUuid());
+        if (future != null && !future.isDone()) {
+            future.complete(response.getResponse().isAccepted());
+        }
     }
 
     @Mixin(targets = "net.minecraft.server.network.ServerPlayNetworkHandler$1")

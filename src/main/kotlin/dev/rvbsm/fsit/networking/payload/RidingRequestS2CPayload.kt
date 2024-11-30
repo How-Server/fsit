@@ -4,9 +4,9 @@ import net.minecraft.network.NetworkSide
 import net.minecraft.network.PacketByteBuf
 import java.util.UUID
 
-data class RidingRequestS2CPayload(val uuid: UUID) : CustomPayload<RidingRequestS2CPayload>(packetId) {
+data class RidingRequestS2CPayload(val playerUUID: UUID) : CustomPayload<RidingRequestS2CPayload>(packetId) {
     override fun write(buf: PacketByteBuf) {
-        buf.writeUuid(uuid)
+        buf.writeUuid(playerUUID)
     }
 
     companion object : Id<RidingRequestS2CPayload>("riding_request", NetworkSide.CLIENTBOUND) {
