@@ -22,7 +22,7 @@
 
 ## v2.6.0
 
-Minecraft Bundles of Bravery Update
+**Bundles of Bravery** drop
 
 ### Added
 
@@ -31,9 +31,9 @@ Minecraft Bundles of Bravery Update
 - Packed with Shadow and Proguard Gradle plugins
 - `sitting.apply_gravity` and `sitting.allow_in_air` had a little conflict and were replaced with `sitting.behaviour`.
   It can have three values:
-  - `nothing`: does nothing
-  - `discard`: discards seats if they do not have any supporting block underneath them
-  - `gravity`: applies movement to seats, e.g. gravity, getting pushed by pistons, fluids
+    - `nothing`: does nothing
+    - `discard`: discards seats if they do not have any supporting block underneath them
+    - `gravity`: applies movement to seats, e.g. gravity, getting pushed by pistons, fluids
 - `sitting.should_center` option that controls if seats should be placed in the centre of a block
 - Traditional Chinese translation by @yichifauzi at [#45](https://github.com/rvbsm/fsit/pull/45). Thank you!
 
@@ -91,9 +91,9 @@ Minecraft Bundles of Bravery Update
 - Packed with Shadow and Proguard Gradle plugins
 - `sitting.apply_gravity` and `sitting.allow_in_air` had a little conflict and were replaced with `sitting.behaviour`.
   `sitting.behaviour` can have three values:
-  - `nothing`: does nothing
-  - `discard`: discards seats if they do not have any supporting block underneath them
-  - `gravity`: applies movement to seats, e.g. gravity, getting pushed by pistons, fluids
+    - `nothing`: does nothing
+    - `discard`: discards seats if they do not have any supporting block underneath them
+    - `gravity`: applies movement to seats, e.g. gravity, getting pushed by pistons, fluids
 
 ### Fixed
 
@@ -216,15 +216,15 @@ Minecraft Tricky Trials Update
 - Preventing from sitting in places where players would suffocate
 - Discard seat if `sitting.apply_gravity` and `sitting.allow_in_air` are disabled
 - New configuration options:
-  - `sitting.allow_in_air`
-  - `riding.hide_rider`
-  - `on_use.check_suffocation`
-  - `on_double_sneak.crawling`
+    - `sitting.allow_in_air`
+    - `riding.hide_rider`
+    - `on_use.check_suffocation`
+    - `on_double_sneak.crawling`
 - New configuration command options:
-  - `allowSittingInAir <bool>`
-  - `hideRider <bool>`
-  - `onUseCheckSuffocation <bool>`
-  - `onSneakCrawl <bool>`
+    - `allowSittingInAir <bool>`
+    - `hideRider <bool>`
+    - `onUseCheckSuffocation <bool>`
+    - `onSneakCrawl <bool>`
 - Add configuration comments
 - Use Machete Gradle plugin to minify JAR size
 
@@ -232,15 +232,15 @@ Minecraft Tricky Trials Update
 
 - Rename `/fsit <allow|restrict>` to `/fsit:client <allow|restrict>`
 - Rename configuration options:
-  - `sitting.on_use` + `riding.on_use` → `on_use`
-  - `sitting.on_double_sneak` → `on_double_sneak`
+    - `sitting.on_use` + `riding.on_use` → `on_use`
+    - `sitting.on_double_sneak` → `on_double_sneak`
 - Rename configuration command names:
-  - `sitOnUse` → `onUseSit`
-  - `rideOnUse` → `onUseRide`
-  - `sitOnUseRange` + `rideOnUseRange` → `onUseRange`
-  - `sitOnSneak` → `onSneakSit`
-  - `sitOnSneakMinPitch` → `onSneakMinPitch`
-  - `sitOnSneakDelay` → `onSneakDelay`
+    - `sitOnUse` → `onUseSit`
+    - `rideOnUse` → `onUseRide`
+    - `sitOnUseRange` + `rideOnUseRange` → `onUseRange`
+    - `sitOnSneak` → `onSneakSit`
+    - `sitOnSneakMinPitch` → `onSneakMinPitch`
+    - `sitOnSneakDelay` → `onSneakDelay`
 - Categorize Mod Menu screen
 - Bump `fabric-commands-api` to v2
 
@@ -264,19 +264,19 @@ Minecraft Tricky Trials Update
 - Configuration migrator (for v1+ JSON and v2 YAML)
 - Optionally apply gravity to seats (`sitting.seats_gravity`)
 - Configuration command options:
-  - `seatsGravity <bool>`
-  - `sitOnSneak <bool>`
-  - `sitOnSneakMinPitch <float>`
-  - `sitOnSneakDelay <integer>`
+    - `seatsGravity <bool>`
+    - `sitOnSneak <bool>`
+    - `sitOnSneakMinPitch <float>`
+    - `sitOnSneakDelay <integer>`
 
 ### Changed
 
 - Try to sit on passed uses (item would not or cannot be used)
 - Rename configuration command names:
-  - `sittableEnabled` → `sitOnUse`
-  - `sittableRadius` → `sitOnUseRange`
-  - `ridingEnabled` → `rideOnUse`
-  - `ridingRadius` → `rideOnUseRange`
+    - `sittableEnabled` → `sitOnUse`
+    - `sittableRadius` → `sitOnUseRange`
+    - `ridingEnabled` → `rideOnUse`
+    - `ridingRadius` → `rideOnUseRange`
 
 ### Fixed
 
@@ -474,11 +474,11 @@ _FSit-client is now a part of the FSit_
 
 - Clear configuration without deleting a configuration file
 - Rename configuration options:
-  - `min_angle` → `sneak.min_angle`
-  - `shift_delay` → `sneak.sneak_delay`
-  - `sittable_blocks` → `sittable.blocks`
-  - `sittable_tags` → `sittable.tags`
-  - `sit_on_players` → `misc.sit_players`
+    - `min_angle` → `sneak.min_angle`
+    - `shift_delay` → `sneak.sneak_delay`
+    - `sittable_blocks` → `sittable.blocks`
+    - `sittable_tags` → `sittable.tags`
+    - `sit_on_players` → `misc.sit_players`
 
 ## v1.0.1
 
