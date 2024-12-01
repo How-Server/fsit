@@ -4,8 +4,8 @@ import dev.rvbsm.fsit.api.event.PassedUseEntityCallback
 import dev.rvbsm.fsit.entity.RideEntity
 import dev.rvbsm.fsit.modScope
 import dev.rvbsm.fsit.networking.config
-import dev.rvbsm.fsit.networking.sendRidingRequest
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
+import dev.rvbsm.fsit.networking.sendRidingRequest
 import dev.rvbsm.fsit.networking.trySend
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.launch
@@ -15,21 +15,21 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private val requestTimeout = 5000.milliseconds
 
-internal val StartRidingListener = PassedUseEntityCallback interact@{ player, _, entity ->
+internal val RidingRequestListener = PassedUseEntityCallback interact@{ player, _, entity ->
     if (entity !is ServerPlayerEntity || !player.canStartRiding(entity)) return@interact ActionResult.PASS
 
     if (!player.config.onUse.riding || !entity.config.onUse.riding) return@interact ActionResult.PASS
     else if (!player.isInRange(entity, player.config.onUse.range.toDouble())) return@interact ActionResult.PASS
 
-    val playerResponseFuture = player.sendRidingRequest(entity.uuid, requestTimeout)
-    player.trySend(RidingRequestS2CPayload(entity.uuid)) { playerResponseFuture.complete(true) }
-    val entityResponseFuture = entity.sendRidingRequest(player.uuid, requestTimeout)
-    entity.trySend(RidingRequestS2CPayload(player.uuid)) { entityResponseFuture.complete(true) }
+    val playerResponse = player.sendRidingRequest(entity.uuid, requestTimeout)
+    player.trySend(RidingRequestS2CPayload(entity.uuid)) { playerResponse.complete(true) }
+    val entityResponse = entity.sendRidingRequest(player.uuid, requestTimeout)
+    entity.trySend(RidingRequestS2CPayload(player.uuid)) { entityResponse.complete(true) }
 
     modScope.launch {
-        val result = playerResponseFuture.thenCombine(entityResponseFuture, Boolean::and).asDeferred()
+        val response = playerResponse.thenCombine(entityResponse, Boolean::and).asDeferred()
 
-        if (result.await() && player.canStartRiding(entity)) {
+        if (response.await() && player.canStartRiding(entity)) {
             RideEntity.create(player, entity)
         }
     }

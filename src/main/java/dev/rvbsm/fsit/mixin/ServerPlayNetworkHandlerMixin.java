@@ -29,9 +29,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +42,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
     public ServerPlayerEntity player;
 
     @Unique
-    private final Map<UUID, CompletableFuture<Boolean>> ridingRequests = new LinkedHashMap<>();
+    private final Map<UUID, CompletableFuture<Boolean>> pendingRidingRequests = new WeakHashMap<>();
 
     @Inject(method = "onClientCommand", at = @At("TAIL"))
     public void onClientCommand(@NotNull ClientCommandC2SPacket packet, CallbackInfo ci) {
@@ -60,9 +60,9 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
     }
 
     @Inject(method = "onDisconnected", at = @At("TAIL"))
-    public void purgeRidingRequests(Text reason, CallbackInfo ci) {
-        for (UUID uuid : this.ridingRequests.keySet()) {
-            this.ridingRequests.remove(uuid).complete(false);
+    public void purgePendingRequests(Text reason, CallbackInfo ci) {
+        for (UUID uuid : this.pendingRidingRequests.keySet()) {
+            this.pendingRidingRequests.remove(uuid).complete(false);
         }
     }
 
@@ -79,8 +79,10 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
 
     @Override
     public @NotNull CompletableFuture<Boolean> fsit$sendRidingRequest(@NotNull UUID playerUUID, @NotNull Duration timeout) {
-        return this.ridingRequests.compute(playerUUID, (uuid, future) -> {
-            if (future != null && !future.isDone()) return CompletableFuture.completedFuture(false);
+        return this.pendingRidingRequests.compute(playerUUID, (uuid, future) -> {
+            if (future != null && !future.isDone()) {
+                return CompletableFuture.completedFuture(false);
+            }
 
             return new CompletableFuture<Boolean>().completeOnTimeout(false, timeout.toMillis(), TimeUnit.MILLISECONDS);
         });
@@ -88,7 +90,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
 
     @Override
     public void fsit$onRidingResponse(@NotNull RidingResponseC2SPayload response) {
-        final CompletableFuture<Boolean> future = this.ridingRequests.remove(response.getUuid());
+        final CompletableFuture<Boolean> future = this.pendingRidingRequests.remove(response.getUuid());
         if (future != null && !future.isDone()) {
             future.complete(response.getResponse().isAccepted());
         }
