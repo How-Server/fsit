@@ -20,9 +20,9 @@ import dev.rvbsm.fsit.config.serialization.asReader
 import dev.rvbsm.fsit.config.serialization.asSerializer
 import dev.rvbsm.fsit.config.serialization.withDefault
 import dev.rvbsm.fsit.entity.ModPose
-import dev.rvbsm.fsit.event.ClientCommandSneakListener
+import dev.rvbsm.fsit.event.SneakListener
 import dev.rvbsm.fsit.event.SpawnSeatListener
-import dev.rvbsm.fsit.event.StartRidingListener
+import dev.rvbsm.fsit.event.RidingRequestListener
 import dev.rvbsm.fsit.event.UpdatePoseListener
 import dev.rvbsm.fsit.networking.ConfigUpdateC2SHandler
 import dev.rvbsm.fsit.networking.PoseRequestC2SHandler
@@ -129,9 +129,9 @@ object FSitMod : ModInitializer {
             modScope = CoroutineScope(it.asCoroutineDispatcher() + SupervisorJob())
         }
 
-        PassedUseEntityCallback.EVENT.register(StartRidingListener)
+        PassedUseEntityCallback.EVENT.register(RidingRequestListener)
         PassedUseBlockCallback.EVENT.register(SpawnSeatListener)
-        ClientCommandCallback.EVENT.register(ClientCommandSneakListener)
+        ClientCommandCallback.EVENT.register(SneakListener)
         UpdatePoseCallback.EVENT.register(UpdatePoseListener)
     }
 
