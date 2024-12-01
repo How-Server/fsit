@@ -20,9 +20,9 @@ import dev.rvbsm.fsit.config.serialization.asReader
 import dev.rvbsm.fsit.config.serialization.asSerializer
 import dev.rvbsm.fsit.config.serialization.withDefault
 import dev.rvbsm.fsit.entity.ModPose
+import dev.rvbsm.fsit.event.RidingRequestListener
 import dev.rvbsm.fsit.event.SneakListener
 import dev.rvbsm.fsit.event.SpawnSeatListener
-import dev.rvbsm.fsit.event.RidingRequestListener
 import dev.rvbsm.fsit.event.UpdatePoseListener
 import dev.rvbsm.fsit.networking.ConfigUpdateC2SHandler
 import dev.rvbsm.fsit.networking.PoseRequestC2SHandler
@@ -53,7 +53,6 @@ import net.minecraft.server.command.ServerCommandSource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KMutableProperty0
-import kotlin.time.TimeSource
 
 @PublishedApi
 internal val modLogger: Logger = LoggerFactory.getLogger(FSitMod::class.java)
@@ -61,8 +60,6 @@ internal val modLogger: Logger = LoggerFactory.getLogger(FSitMod::class.java)
 @PublishedApi
 internal lateinit var modScope: CoroutineScope
     private set
-
-val modTimeSource = TimeSource.Monotonic
 
 @OptIn(ExperimentalSerializationApi::class)
 @Suppress("json_format_redundant")

@@ -1,11 +1,12 @@
 package dev.rvbsm.fsit.client.option
 
-import dev.rvbsm.fsit.modTimeSource
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
+import net.minecraft.util.Util
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @Environment(EnvType.CLIENT)
 class HybridKeyBinding(
@@ -16,7 +17,7 @@ class HybridKeyBinding(
     private val modeGetter: () -> KeyBindingMode,
 ) : KeyBinding(id, InputUtil.Type.KEYSYM, code, category) {
 
-    private var pressMark = modTimeSource.markNow()
+    private var pressTime = 0L
     private var prevPressed = false
     private var isSticky = false
 
@@ -25,8 +26,12 @@ class HybridKeyBinding(
             KeyBindingMode.Toggle -> true
             KeyBindingMode.Hold -> false
             KeyBindingMode.Hybrid -> isSticky.let {
-                if (pressed) isSticky.also { pressMark = modTimeSource.markNow() }
-                else if (prevPressed) pressMark.elapsedNow() <= duration else isSticky
+                if (pressed) {
+                    pressTime = Util.getMeasuringTimeMs()
+                }
+
+                if (pressed || !prevPressed) isSticky
+                else (Util.getMeasuringTimeMs() - pressTime).milliseconds <= duration
             }
         }
 
