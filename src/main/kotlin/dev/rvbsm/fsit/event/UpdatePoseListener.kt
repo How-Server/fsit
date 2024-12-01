@@ -2,7 +2,7 @@ package dev.rvbsm.fsit.event
 
 import dev.rvbsm.fsit.api.event.UpdatePoseCallback
 import dev.rvbsm.fsit.entity.CrawlEntity
-import dev.rvbsm.fsit.entity.PlayerPose
+import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.entity.SeatEntity
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.hasConfig
@@ -15,12 +15,12 @@ import dev.rvbsm.fsit.util.math.centered
 
 val UpdatePoseListener = UpdatePoseCallback update@{ player, pose, pos ->
     when (pose) {
-        PlayerPose.Standing -> {
+        ModPose.Standing -> {
             if (player.vehicle is SeatEntity) player.stopRiding()
             else if (player.hasCrawl()) player.removeCrawl()
         }
 
-        PlayerPose.Sitting -> {
+        ModPose.Sitting -> {
             // note: prevents from creating seats in the air without gravity
             if (!player.config.sitting.behaviour.shouldMove && !player.isOnGround) {
                 return@update player.resetPose()
@@ -33,7 +33,7 @@ val UpdatePoseListener = UpdatePoseCallback update@{ player, pose, pos ->
             SeatEntity.create(player, seatPos)
         }
 
-        PlayerPose.Crawling -> if (!player.hasConfig()) {
+        ModPose.Crawling -> if (!player.hasConfig()) {
             CrawlEntity.create(player)
         }
 

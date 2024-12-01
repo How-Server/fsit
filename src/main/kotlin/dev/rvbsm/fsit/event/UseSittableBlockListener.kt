@@ -1,7 +1,7 @@
 package dev.rvbsm.fsit.event
 
 import dev.rvbsm.fsit.api.event.PassedUseBlockCallback
-import dev.rvbsm.fsit.entity.PlayerPose
+import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.setPose
 import dev.rvbsm.fsit.registry.RegistrySet
@@ -26,7 +26,7 @@ val SpawnSeatListener = PassedUseBlockCallback interact@{ player, _, hitResult -
     if (player.shouldCancelInteraction() || hitResult.side != Direction.UP) return@interact ActionResult.PASS
     if (!player.canSitOn(hitResult)) return@interact ActionResult.PASS
 
-    player.setPose(PlayerPose.Sitting, hitResult.pos)
+    player.setPose(ModPose.Sitting, hitResult.pos)
     return@interact ActionResult.SUCCESS
 }
 

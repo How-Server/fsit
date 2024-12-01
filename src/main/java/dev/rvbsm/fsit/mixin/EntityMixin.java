@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements ServerPlayerVelocity {
+public abstract class EntityMixin {
 
     @Shadow
     public abstract boolean isSneaking();

@@ -10,5 +10,6 @@ import java.util.concurrent.CompletableFuture;
 public interface RidingRequestHandler {
 
     @NotNull CompletableFuture<Boolean> fsit$sendRidingRequest(@NotNull UUID playerUUID, @NotNull Duration duration);
-    void fsit$receiveRidingResponse(@NotNull RidingResponseC2SPayload response);
+
+    void fsit$onRidingResponse(@NotNull RidingResponseC2SPayload response);
 }

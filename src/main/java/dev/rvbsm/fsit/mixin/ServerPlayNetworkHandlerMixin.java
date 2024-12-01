@@ -59,7 +59,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
         if (interactionActionResult == ActionResult.PASS && handRef.get() == Hand.OFF_HAND && player.getStackInHand(handRef.get()).getUseAction().ordinal() == 0) {
             handRef.set(Hand.MAIN_HAND);
 
-            return PassedUseBlockCallback.EVENT.invoker().interactBlock(player, world, blockHitResult);
+            return PassedUseBlockCallback.EVENT.invoker().interact(player, world, blockHitResult);
         }
 
         return interactionActionResult;
@@ -75,7 +75,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
     }
 
     @Override
-    public void fsit$receiveRidingResponse(@NotNull RidingResponseC2SPayload response) {
+    public void fsit$onRidingResponse(@NotNull RidingResponseC2SPayload response) {
         final CompletableFuture<Boolean> future = this.ridingRequests.remove(response.getUuid());
         if (future != null && !future.isDone()) {
             future.complete(response.getResponse().isAccepted());
@@ -101,7 +101,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
             if (interactionActionResult == ActionResult.PASS && handRef.get() == Hand.OFF_HAND && field_28963.player.getStackInHand(handRef.get()).getUseAction().ordinal() == 0) {
                 handRef.set(Hand.MAIN_HAND);
 
-                return PassedUseEntityCallback.EVENT.invoker().interactEntity(field_28963.player, field_39991, field_28962);
+                return PassedUseEntityCallback.EVENT.invoker().interact(field_28963.player, field_39991, field_28962);
             }
 
             return interactionActionResult;

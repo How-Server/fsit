@@ -5,7 +5,7 @@ import dev.rvbsm.fsit.client.FSitModClient
 import dev.rvbsm.fsit.client.networking.pose
 import dev.rvbsm.fsit.client.networking.setPose
 import dev.rvbsm.fsit.client.option.HybridKeyBinding
-import dev.rvbsm.fsit.entity.PlayerPose
+import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.networking.payload.PoseRequestC2SPayload
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.option.KeyBinding
@@ -38,19 +38,19 @@ val KeyBindingsListener = ClientTickEvents.EndTick tick@{ client ->
     if (!FSitMod.config.sitting.behaviour.shouldMove && !player.isOnGround && !player.hasVehicle()) return@tick
 
     val pose = when (player.pose()) {
-        PlayerPose.Standing -> when {
-            sitKey.isPressed -> PlayerPose.Sitting
-            crawlKey.isPressed -> PlayerPose.Crawling
+        ModPose.Standing -> when {
+            sitKey.isPressed -> ModPose.Sitting
+            crawlKey.isPressed -> ModPose.Crawling
             else -> return@tick
         }
 
-        PlayerPose.Sitting -> if (!sitKey.isPressed && wasPressed) PlayerPose.Standing else return@tick
-        PlayerPose.Crawling -> if (!crawlKey.isPressed && wasPressed) PlayerPose.Standing else return@tick
+        ModPose.Sitting -> if (!sitKey.isPressed && wasPressed) ModPose.Standing else return@tick
+        ModPose.Crawling -> if (!crawlKey.isPressed && wasPressed) ModPose.Standing else return@tick
 
         else -> return@tick
     }
 
-    wasPressed = pose != PlayerPose.Standing
+    wasPressed = pose != ModPose.Standing
     if (!wasPressed) {
         untoggleKeyBindings()
     }

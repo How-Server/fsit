@@ -1,6 +1,6 @@
 package dev.rvbsm.fsit.entity
 
-enum class PlayerPose {
+enum class ModPose {
     Standing,
     _Sneaking,
     Sitting,

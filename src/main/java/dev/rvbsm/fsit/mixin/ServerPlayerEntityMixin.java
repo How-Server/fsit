@@ -2,18 +2,19 @@ package dev.rvbsm.fsit.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.rvbsm.fsit.FSitMod;
-import dev.rvbsm.fsit.api.entity.ConfigurableEntity;
-import dev.rvbsm.fsit.api.entity.CrawlableEntity;
+import dev.rvbsm.fsit.api.player.PlayerConfig;
+import dev.rvbsm.fsit.api.player.PlayerCrawl;
 import dev.rvbsm.fsit.api.event.UpdatePoseCallback;
 import dev.rvbsm.fsit.api.network.ServerPlayerVelocity;
 import dev.rvbsm.fsit.config.ModConfig;
 import dev.rvbsm.fsit.entity.CrawlEntity;
 import dev.rvbsm.fsit.entity.DismountingKt;
-import dev.rvbsm.fsit.entity.PlayerPose;
+import dev.rvbsm.fsit.entity.ModPose;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ConfigurableEntity, CrawlableEntity, ServerPlayerVelocity {
+public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin
+        implements PlayerConfig, PlayerCrawl, ServerPlayerVelocity {
+
     @Shadow
     public abstract void stopRiding();
 
@@ -51,14 +54,14 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
 
     @Inject(method = "onDisconnect", at = @At("TAIL"))
     private void dismountSeat(CallbackInfo ci) {
-        if (this.fsit$isInPose(PlayerPose.Sitting)) {
+        if (this.fsit$isInPose(ModPose.Sitting)) {
             this.stopRiding();
         }
     }
 
     @Inject(method = "copyFrom", at = @At("TAIL"))
     private void copyConfig(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        final ConfigurableEntity configurablePlayer = (ConfigurableEntity) oldPlayer;
+        final PlayerConfig configurablePlayer = (PlayerConfig) oldPlayer;
         if (configurablePlayer.fsit$hasConfig()) {
             this.config = configurablePlayer.fsit$getConfig();
         }
@@ -66,7 +69,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
 
     @Inject(method = "stopRiding", at = @At("TAIL"))
     private void resetPose(CallbackInfo ci, @Local Entity entity) {
-        if (this.fsit$isInPose(PlayerPose.Sitting)) {
+        if (this.fsit$isInPose(ModPose.Sitting)) {
             this.fsit$resetPose();
         }
     }
@@ -106,10 +109,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     }
 
     @Override
-    public void fsit$setPose(@NotNull PlayerPose pose, @Nullable Vec3d pos) {
+    public void fsit$setPose(@NotNull ModPose pose, @Nullable Vec3d pos) {
         super.fsit$setPose(pose, pos);
 
-        UpdatePoseCallback.EVENT.invoker().updatePose((ServerPlayerEntity) (Object) this, pose, pos);
+        UpdatePoseCallback.EVENT.invoker().update((ServerPlayerEntity) (Object) this, pose, pos);
     }
 
     @Override

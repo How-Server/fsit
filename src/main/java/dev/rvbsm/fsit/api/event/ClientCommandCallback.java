@@ -8,11 +8,12 @@ import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface ClientCommandCallback {
+
     Event<ClientCommandCallback> EVENT = EventFactory.createArrayBacked(ClientCommandCallback.class, (listeners) -> (player, mode) -> {
         for (ClientCommandCallback listener : listeners) {
-            listener.onClientMode(player, mode);
+            listener.process(player, mode);
         }
     });
 
-    void onClientMode(@NotNull ServerPlayerEntity player, @NotNull ClientCommandC2SPacket.Mode mode);
+    void process(@NotNull ServerPlayerEntity player, @NotNull ClientCommandC2SPacket.Mode mode);
 }

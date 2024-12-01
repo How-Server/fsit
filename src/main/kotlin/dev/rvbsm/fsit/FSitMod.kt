@@ -19,7 +19,7 @@ import dev.rvbsm.fsit.config.serialization.Yaml
 import dev.rvbsm.fsit.config.serialization.asReader
 import dev.rvbsm.fsit.config.serialization.asSerializer
 import dev.rvbsm.fsit.config.serialization.withDefault
-import dev.rvbsm.fsit.entity.PlayerPose
+import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.event.ClientCommandSneakListener
 import dev.rvbsm.fsit.event.SpawnSeatListener
 import dev.rvbsm.fsit.event.StartRidingListener
@@ -156,7 +156,7 @@ object FSitMod : ModInitializer {
             configArgument("onSneakDelay") { config.onSneak::delay }
         }
 
-        fun poseCommand(name: String, pose: PlayerPose) = command(name) {
+        fun poseCommand(name: String, pose: ModPose) = command(name) {
             requires(ServerCommandSource::isExecutedByPlayer)
 
             executes {
@@ -168,8 +168,8 @@ object FSitMod : ModInitializer {
             }
         }
 
-        poseCommand("sit", PlayerPose.Sitting)
-        poseCommand("crawl", PlayerPose.Crawling)
+        poseCommand("sit", ModPose.Sitting)
+        poseCommand("crawl", ModPose.Crawling)
     }
 }
 

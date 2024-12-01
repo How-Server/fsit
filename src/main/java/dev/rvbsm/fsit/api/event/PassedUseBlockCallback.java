@@ -10,9 +10,10 @@ import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface PassedUseBlockCallback {
+
     Event<PassedUseBlockCallback> EVENT = EventFactory.createArrayBacked(PassedUseBlockCallback.class, (listeners) -> (player, world, hitResult) -> {
         for (PassedUseBlockCallback listener : listeners) {
-            final ActionResult result = listener.interactBlock(player, world, hitResult);
+            final ActionResult result = listener.interact(player, world, hitResult);
 
             if (result != ActionResult.PASS) {
                 return result;
@@ -22,5 +23,5 @@ public interface PassedUseBlockCallback {
         return ActionResult.PASS;
     });
 
-    ActionResult interactBlock(@NotNull ServerPlayerEntity player, @NotNull World world, @NotNull BlockHitResult hitResult);
+    ActionResult interact(@NotNull ServerPlayerEntity player, @NotNull World world, @NotNull BlockHitResult hitResult);
 }

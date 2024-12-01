@@ -1,13 +1,13 @@
 package dev.rvbsm.fsit.networking
 
-import dev.rvbsm.fsit.api.entity.ConfigurableEntity
-import dev.rvbsm.fsit.api.entity.CrawlableEntity
-import dev.rvbsm.fsit.api.entity.PoseableEntity
 import dev.rvbsm.fsit.api.network.RidingRequestHandler
 import dev.rvbsm.fsit.api.network.ServerPlayerVelocity
+import dev.rvbsm.fsit.api.player.PlayerConfig
+import dev.rvbsm.fsit.api.player.PlayerCrawl
+import dev.rvbsm.fsit.api.player.PlayerPose
 import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.entity.CrawlEntity
-import dev.rvbsm.fsit.entity.PlayerPose
+import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.networking.payload.CustomPayload
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -23,21 +23,19 @@ internal fun <P> ServerPlayerEntity.trySend(payload: P, orAction: () -> Unit = {
     } else orAction()
 }
 
-fun ServerPlayerEntity.setPose(pose: PlayerPose, pos: Vec3d? = null) =
-    (this as PoseableEntity).`fsit$setPose`(pose, pos)
+fun ServerPlayerEntity.setPose(pose: ModPose, pos: Vec3d? = null) = (this as PlayerPose).`fsit$setPose`(pose, pos)
+fun ServerPlayerEntity.resetPose() = (this as PlayerPose).`fsit$resetPose`()
+fun ServerPlayerEntity.isInPose() = (this as PlayerPose).`fsit$isInPose`()
 
-fun ServerPlayerEntity.resetPose() = (this as PoseableEntity).`fsit$resetPose`()
-fun ServerPlayerEntity.isInPose() = (this as PoseableEntity).`fsit$isInPose`()
-
-fun ServerPlayerEntity.setCrawl(crawlEntity: CrawlEntity) = (this as CrawlableEntity).`fsit$startCrawling`(crawlEntity)
-fun ServerPlayerEntity.removeCrawl() = (this as CrawlableEntity).`fsit$stopCrawling`()
-fun ServerPlayerEntity.hasCrawl() = (this as CrawlableEntity).`fsit$isCrawling`()
+fun ServerPlayerEntity.setCrawl(crawlEntity: CrawlEntity) = (this as PlayerCrawl).`fsit$startCrawling`(crawlEntity)
+fun ServerPlayerEntity.removeCrawl() = (this as PlayerCrawl).`fsit$stopCrawling`()
+fun ServerPlayerEntity.hasCrawl() = (this as PlayerCrawl).`fsit$isCrawling`()
 
 var ServerPlayerEntity.config: ModConfig
-    get() = (this as ConfigurableEntity).`fsit$getConfig`()
-    set(config) = (this as ConfigurableEntity).`fsit$setConfig`(config)
+    get() = (this as PlayerConfig).`fsit$getConfig`()
+    set(config) = (this as PlayerConfig).`fsit$setConfig`(config)
 
-fun ServerPlayerEntity.hasConfig() = (this as ConfigurableEntity).`fsit$hasConfig`()
+fun ServerPlayerEntity.hasConfig() = (this as PlayerConfig).`fsit$hasConfig`()
 
 val ServerPlayerEntity.realVelocity get() = (this as ServerPlayerVelocity).`fsit$getPlayerVelocity`()
 
@@ -45,4 +43,4 @@ fun ServerPlayerEntity.sendRidingRequest(playerUUID: UUID, timeout: Duration) =
     (networkHandler as RidingRequestHandler).`fsit$sendRidingRequest`(playerUUID, timeout.toJavaDuration())
 
 fun ServerPlayerEntity.onRidingResponse(response: RidingResponseC2SPayload) =
-    (networkHandler as RidingRequestHandler).`fsit$receiveRidingResponse`(response)
+    (networkHandler as RidingRequestHandler).`fsit$onRidingResponse`(response)
