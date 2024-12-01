@@ -4,6 +4,7 @@ import dev.rvbsm.fsit.api.network.RidingRequestHandler
 import dev.rvbsm.fsit.api.network.ServerPlayerVelocity
 import dev.rvbsm.fsit.api.player.PlayerConfig
 import dev.rvbsm.fsit.api.player.PlayerCrawl
+import dev.rvbsm.fsit.api.player.PlayerLastSneakTime
 import dev.rvbsm.fsit.api.player.PlayerPose
 import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.entity.CrawlEntity
@@ -44,3 +45,6 @@ fun ServerPlayerEntity.sendRidingRequest(playerUUID: UUID, timeout: Duration) =
 
 fun ServerPlayerEntity.onRidingResponse(response: RidingResponseC2SPayload) =
     (networkHandler as RidingRequestHandler).`fsit$onRidingResponse`(response)
+
+val ServerPlayerEntity.lastSneakTime: Long
+    get() = (this as PlayerLastSneakTime).`fsit$getLastSneakTime`()

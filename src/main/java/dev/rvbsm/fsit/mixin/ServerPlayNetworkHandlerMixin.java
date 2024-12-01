@@ -6,6 +6,8 @@ import dev.rvbsm.fsit.api.event.ClientCommandCallback;
 import dev.rvbsm.fsit.api.event.PassedUseBlockCallback;
 import dev.rvbsm.fsit.api.event.PassedUseEntityCallback;
 import dev.rvbsm.fsit.api.network.RidingRequestHandler;
+import dev.rvbsm.fsit.api.player.PlayerLastSneakTime;
+import dev.rvbsm.fsit.entity.RideEntity;
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -44,7 +46,17 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
 
     @Inject(method = "onClientCommand", at = @At("TAIL"))
     public void onClientCommand(@NotNull ClientCommandC2SPacket packet, CallbackInfo ci) {
-        ClientCommandCallback.EVENT.invoker().onClientMode(this.player, packet.getMode());
+        ClientCommandCallback.EVENT.invoker().process(this.player, packet.getMode());
+
+        switch (packet.getMode()) {
+            case PRESS_SHIFT_KEY -> {
+                if (this.player.getFirstPassenger() instanceof RideEntity rideEntity) {
+                    rideEntity.stopRiding();
+                }
+            }
+
+            case RELEASE_SHIFT_KEY -> ((PlayerLastSneakTime) player).fsit$updateLastSneakTime();
+        }
     }
 
     @Inject(method = "onDisconnected", at = @At("TAIL"))

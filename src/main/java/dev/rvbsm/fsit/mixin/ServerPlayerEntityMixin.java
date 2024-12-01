@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.rvbsm.fsit.FSitMod;
 import dev.rvbsm.fsit.api.player.PlayerConfig;
 import dev.rvbsm.fsit.api.player.PlayerCrawl;
+import dev.rvbsm.fsit.api.player.PlayerLastSneakTime;
 import dev.rvbsm.fsit.api.event.UpdatePoseCallback;
 import dev.rvbsm.fsit.api.network.ServerPlayerVelocity;
 import dev.rvbsm.fsit.config.ModConfig;
@@ -27,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin
-        implements PlayerConfig, PlayerCrawl, ServerPlayerVelocity {
+        implements PlayerConfig, PlayerCrawl, ServerPlayerVelocity, PlayerLastSneakTime {
 
     @Shadow
     public abstract void stopRiding();
@@ -38,6 +39,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin
     private @Nullable CrawlEntity crawlEntity;
     @Unique
     private @NotNull Vec3d playerVelocity = Vec3d.ZERO;
+    @Unique
+    private long lastSneakTime = 0L;
 
     @Inject(method = "playerTick", at = @At("TAIL"))
     private void tickPosing(CallbackInfo ci) {
@@ -136,5 +139,15 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin
     @Override
     public @NotNull Vec3d fsit$getPlayerVelocity() {
         return this.playerVelocity;
+    }
+
+    @Override
+    public void fsit$updateLastSneakTime() {
+        this.lastSneakTime = Util.getMeasuringTimeMs();
+    }
+
+    @Override
+    public long fsit$getLastSneakTime() {
+        return this.lastSneakTime;
     }
 }
