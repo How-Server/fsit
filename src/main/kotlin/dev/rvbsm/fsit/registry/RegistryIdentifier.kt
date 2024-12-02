@@ -31,11 +31,8 @@ data class RegistryIdentifier(val id: Identifier, val isTag: Boolean) {
     object Serializer : KSerializer<RegistryIdentifier> {
         override val descriptor = PrimitiveSerialDescriptor("dev.rvbsm.RegistryIdentifier", PrimitiveKind.STRING)
 
+        override fun serialize(encoder: Encoder, value: RegistryIdentifier) = encoder.encodeString("$value")
         override fun deserialize(decoder: Decoder) = of(decoder.decodeString())
-
-        override fun serialize(encoder: Encoder, value: RegistryIdentifier) {
-            encoder.encodeString("$value")
-        }
     }
 }
 

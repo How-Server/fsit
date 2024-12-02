@@ -1,8 +1,8 @@
 package dev.rvbsm.fsit.config
 
-import dev.rvbsm.fsit.config.migration.migrateTo
-import dev.rvbsm.fsit.config.migration.migrationKey
-import dev.rvbsm.fsit.config.migration.version
+import dev.rvbsm.fsit.serialization.migration.migrateTo
+import dev.rvbsm.fsit.serialization.migration.migrationKey
+import dev.rvbsm.fsit.serialization.migration.version
 import dev.rvbsm.fsit.util.text.splitOnce
 
 internal val configSchemas = setOf(

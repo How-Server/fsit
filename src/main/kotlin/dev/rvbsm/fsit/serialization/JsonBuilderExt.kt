@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.serialization
+package dev.rvbsm.fsit.serialization
 
 import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.modules.overwriteWith

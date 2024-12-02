@@ -17,7 +17,7 @@ internal val ConfigUpdateC2SHandler = ServerPayloadHandler<ConfigUpdateC2SPayloa
     }
 }
 
-internal val PoseRequestC2SHandler = ServerPayloadHandler<PoseRequestC2SPayload> {player, _ ->
+internal val PoseRequestC2SHandler = ServerPayloadHandler<PoseRequestC2SPayload> { player, _ ->
     player.setPose(pose)
 }
 

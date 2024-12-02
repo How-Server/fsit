@@ -1,6 +1,6 @@
-package dev.rvbsm.fsit.config.migration
+package dev.rvbsm.fsit.serialization.migration
 
-import dev.rvbsm.fsit.config.serialization.preferContextual
+import dev.rvbsm.fsit.serialization.preferContextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonBuilder

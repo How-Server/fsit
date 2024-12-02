@@ -12,13 +12,6 @@ import dev.rvbsm.fsit.command.isGameMaster
 import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.config.configSchemas
 import dev.rvbsm.fsit.config.getOrDefault
-import dev.rvbsm.fsit.config.migration.version
-import dev.rvbsm.fsit.config.migration.withMigration
-import dev.rvbsm.fsit.config.serialization.UUIDSerializer
-import dev.rvbsm.fsit.config.serialization.Yaml
-import dev.rvbsm.fsit.config.serialization.asReader
-import dev.rvbsm.fsit.config.serialization.asSerializer
-import dev.rvbsm.fsit.config.serialization.withDefault
 import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.event.RidingRequestListener
 import dev.rvbsm.fsit.event.SneakListener
@@ -33,6 +26,13 @@ import dev.rvbsm.fsit.networking.payload.PoseRequestC2SPayload
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload
 import dev.rvbsm.fsit.networking.resetPose
 import dev.rvbsm.fsit.networking.setPose
+import dev.rvbsm.fsit.serialization.UUIDSerializer
+import dev.rvbsm.fsit.serialization.Yaml
+import dev.rvbsm.fsit.serialization.asReader
+import dev.rvbsm.fsit.serialization.asSerializer
+import dev.rvbsm.fsit.serialization.migration.version
+import dev.rvbsm.fsit.serialization.migration.withMigration
+import dev.rvbsm.fsit.serialization.withDefault
 import dev.rvbsm.fsit.util.id
 import dev.rvbsm.fsit.util.text.literal
 import dev.rvbsm.fsit.util.text.translatable
@@ -52,7 +52,6 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.command.ServerCommandSource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import kotlin.reflect.KMutableProperty0
 
 @PublishedApi
 internal val modLogger: Logger = LoggerFactory.getLogger(FSitMod::class.java)
@@ -91,7 +90,13 @@ object FSitMod : ModInitializer {
     )
 
     @JvmStatic
-    lateinit var config: ModConfig private set
+    var config: ModConfig = ModConfig.Default
+        private set
+
+    suspend fun writeConfig(newConfig: ModConfig) {
+        config = newConfig
+        configReader.write(newConfig)
+    }
 
     @JvmStatic
     fun id(path: String) = path.id(MOD_ID)
@@ -99,16 +104,8 @@ object FSitMod : ModInitializer {
     @JvmStatic
     fun translatable(category: String, path: String, vararg args: Any) = "$category.$MOD_ID.$path".translatable(args)
 
-    private suspend fun loadConfig() {
+    override fun onInitialize() = runBlocking {
         config = configReader.read().getOrDefault()
-    }
-
-    suspend fun saveConfig() {
-        configReader.write(config)
-    }
-
-    override fun onInitialize() {
-        runBlocking { loadConfig() }
 
         registerPayloads()
         registerEvents()
@@ -137,20 +134,20 @@ object FSitMod : ModInitializer {
             requires(ServerCommandSource::isGameMaster)
 
             literal("reload") executesSuspend {
-                loadConfig()
+                config = configReader.read().getOrDefault()
                 source.sendFeedback("Reloaded config!"::literal, true)
             }
 
-            configArgument("useServer") { config::useServer }
-            configArgument("centerSeats") { config.sitting::shouldCenter }
-            configArgument("onUseSit") { config.onUse::sitting }
-            configArgument("onUseRide") { config.onUse::riding }
-            configArgument("onUseRange") { config.onUse::range }
-            configArgument("onUseCheckSuffocation") { config.onUse::checkSuffocation }
-            configArgument("onSneakSit") { config.onSneak::sitting }
-            configArgument("onSneakCrawl") { config.onSneak::crawling }
-            configArgument("onSneakMinPitch") { config.onSneak::minPitch }
-            configArgument("onSneakDelay") { config.onSneak::delay }
+            configArgument("useServer", { config.useServer }) { useServer = it }
+            configArgument("centerSeats", { config.sitting.shouldCenter }) { sittingShouldCenter = it }
+            configArgument("onUseSit", { config.onUse.sitting }) { onUseSitting = it }
+            configArgument("onUseRide", { config.onUse.riding }) { onUseRiding = it }
+            configArgument("onUseRange", { config.onUse.range }) { onUseRange = it }
+            configArgument("onUseCheckSuffocation", { config.onUse.checkSuffocation }) { onUseCheckSuffocation = it }
+            configArgument("onSneakSit", { config.onSneak.sitting }) { onSneakSitting = it }
+            configArgument("onSneakCrawl", { config.onSneak.crawling }) { onSneakCrawling = it }
+            configArgument("onSneakMinPitch", { config.onSneak.minPitch }) { onSneakMinPitch = it }
+            configArgument("onSneakDelay", { config.onSneak.delay }) { onSneakDelay = it }
         }
 
         fun poseCommand(name: String, pose: ModPose) = command(name) {
@@ -172,18 +169,22 @@ object FSitMod : ModInitializer {
 
 private inline fun <reified T> CommandBuilder<ServerCommandSource, *>.configArgument(
     name: String,
-    crossinline propertyGetter: () -> KMutableProperty0<T>,
+    crossinline getValue: () -> T,
+    crossinline setValue: ModConfig.Builder.(T) -> Unit,
 ) = literal(name) {
     executes {
-        val property = propertyGetter()
-        source.sendFeedback("Config option $name is currently set to: ${property.get()}"::literal, false)
+        val value = getValue()
+        source.sendFeedback("Config option $name is currently set to: $value"::literal, false)
     }
 
     argument<T>("value") {
         executesSuspend {
-            val property = propertyGetter()
-            property.set(it()).also { FSitMod.saveConfig() }
-            source.sendFeedback("Config option $name is now set to: ${property.get()}"::literal, true)
+            val configBuilder = ModConfig.Builder(FSitMod.config)
+            configBuilder.setValue(it())
+            FSitMod.writeConfig(configBuilder.build())
+
+            val value = getValue()
+            source.sendFeedback("Config option $name is now set to: $value"::literal, true)
         }
     }
 }

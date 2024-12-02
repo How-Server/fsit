@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.serialization
+package dev.rvbsm.fsit.serialization
 
 import com.charleskorn.kaml.AmbiguousQuoteStyle
 import com.charleskorn.kaml.MultiLineStringStyle

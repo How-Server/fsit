@@ -10,13 +10,13 @@ import dev.rvbsm.fsit.client.networking.PoseUpdateS2CHandler
 import dev.rvbsm.fsit.client.networking.RidingRequestS2CHandler
 import dev.rvbsm.fsit.client.option.KeyBindingMode
 import dev.rvbsm.fsit.client.option.enumOption
-import dev.rvbsm.fsit.config.serialization.asReader
 import dev.rvbsm.fsit.jsonSerializer
 import dev.rvbsm.fsit.networking.payload.ConfigUpdateC2SPayload
 import dev.rvbsm.fsit.networking.payload.CustomPayload
 import dev.rvbsm.fsit.networking.payload.PoseUpdateS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
 import dev.rvbsm.fsit.networking.payload.RidingResponseC2SPayload
+import dev.rvbsm.fsit.serialization.asReader
 import dev.rvbsm.fsit.util.text.literal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -51,20 +51,22 @@ private val restrictionsReader = jsonSerializer.asReader<Json, RestrictionSet>(
 )
 
 object FSitModClient : ClientModInitializer {
-
-    @JvmStatic
     val isServerFSitCompatible get() = ClientPlayNetworking.canSend(ConfigUpdateC2SPayload.packetId)
-
-    @JvmStatic
     val sitMode = enumOption("key.fsit.sit", KeyBindingMode.Hybrid)
-
-    @JvmStatic
     val crawlMode = enumOption("key.fsit.crawl", KeyBindingMode.Hybrid)
+    private var socialRestrictions: RestrictionSet = mutableSetOf()
 
-    private lateinit var socialRestrictions: RestrictionSet
+    internal fun <T> trySend(payload: T, orAction: () -> Unit = {}) where T : CustomPayload<T> {
+        if (ClientPlayNetworking.canSend(payload.id)) {
+            ClientPlayNetworking.send(payload)
+        } else orAction()
+    }
 
-    private fun RestrictionSet.store(uuid: UUID) = add(uuid).also { modClientScope.launch { saveRestrictions() } }
-    private fun RestrictionSet.delete(uuid: UUID) = remove(uuid).also { modClientScope.launch { saveRestrictions() } }
+    internal suspend fun syncConfig() = trySend(ConfigUpdateC2SPayload.encode(FSitMod.config))
+
+    private suspend fun writeRestrictions() = restrictionsReader.write(socialRestrictions)
+    private fun RestrictionSet.store(uuid: UUID) = add(uuid).also { modClientScope.launch { writeRestrictions() } }
+    private fun RestrictionSet.delete(uuid: UUID) = remove(uuid).also { modClientScope.launch { writeRestrictions() } }
 
     @JvmStatic
     fun restrictInteractionsFor(uuid: UUID) = socialRestrictions.store(uuid).also removeRestrictedPassenger@{
@@ -88,31 +90,8 @@ object FSitModClient : ClientModInitializer {
         if (!it) throw alreadyAllowedException.create()
     }
 
-    internal fun <T> trySend(payload: T, orAction: () -> Unit = {}) where T : CustomPayload<T> {
-        if (ClientPlayNetworking.canSend(payload.id)) {
-            ClientPlayNetworking.send(payload)
-        } else orAction()
-    }
-
-    private suspend fun loadRestrictions() {
-        socialRestrictions = restrictionsReader.read().getOrDefault(mutableSetOf())
-    }
-
-    private suspend fun saveRestrictions() {
-        restrictionsReader.write(socialRestrictions)
-    }
-
-    internal suspend fun saveConfig() {
-        FSitMod.saveConfig()
-        syncConfig()
-    }
-
-    private suspend fun syncConfig() {
-        trySend(ConfigUpdateC2SPayload.encode(FSitMod.config))
-    }
-
     override fun onInitializeClient() = runBlocking {
-        loadRestrictions()
+        socialRestrictions = restrictionsReader.read().getOrDefault(mutableSetOf())
 
         registerClientPayloads()
         registerClientEvents()

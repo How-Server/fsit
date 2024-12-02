@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.serialization
+package dev.rvbsm.fsit.serialization
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

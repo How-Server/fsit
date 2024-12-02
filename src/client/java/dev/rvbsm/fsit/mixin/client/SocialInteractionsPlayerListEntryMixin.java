@@ -49,7 +49,7 @@ public abstract class SocialInteractionsPlayerListEntryMixin extends ElementList
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", shift = At.Shift.AFTER, ordinal = 1))
     protected void restrictButtons(CallbackInfo ci) {
-        if (FSitModClient.isServerFSitCompatible()) {
+        if (FSitModClient.INSTANCE.isServerFSitCompatible()) {
             //? if <=1.20.1 {
             this.restrictButton = new TexturedButtonWidget(0, 0, 20, 20, 0, 0, 20, RESTRICT_TEXTURE, this::restrict);
             this.allowButton = new TexturedButtonWidget(0, 0, 20, 20, 20, 0, 20, RESTRICT_TEXTURE, this::allow);

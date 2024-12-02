@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.migration
+package dev.rvbsm.fsit.serialization.migration
 
 import com.charleskorn.kaml.Location
 import com.charleskorn.kaml.YamlInput
@@ -9,8 +9,8 @@ import com.charleskorn.kaml.YamlNull
 import com.charleskorn.kaml.YamlPath
 import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.YamlTaggedNode
-import dev.rvbsm.fsit.config.serialization.YamlBuilder
-import dev.rvbsm.fsit.config.serialization.preferContextual
+import dev.rvbsm.fsit.serialization.YamlBuilder
+import dev.rvbsm.fsit.serialization.preferContextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder

@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.migration
+package dev.rvbsm.fsit.serialization.migration
 
 typealias Transformer = (String) -> String
 

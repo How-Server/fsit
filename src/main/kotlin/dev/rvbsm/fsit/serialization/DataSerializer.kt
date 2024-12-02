@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.serialization
+package dev.rvbsm.fsit.serialization
 
 import dev.rvbsm.fsit.modLogger
 import kotlinx.coroutines.Dispatchers

@@ -22,19 +22,18 @@ import dev.rvbsm.fsit.registry.toRegistrySet
 import dev.rvbsm.fsit.util.text.translatable
 import kotlinx.coroutines.launch
 import net.minecraft.registry.Registries
-import net.minecraft.text.Text
 
 // todo: make it look better 👽
 object FSitModMenu : ModMenuApi {
-    private val defaultConfig = ModConfig()
-
     override fun getModConfigScreenFactory(): ConfigScreenFactory<*> {
         return ConfigScreenFactory { screen ->
             YetAnotherConfigLib(FSitMod.MOD_ID) {
+                val configBuilder = ModConfig.Builder(FSitMod.config)
+
                 val general by categories.registering {
                     val useServer by rootOptions.registering {
                         controller = tickBox()
-                        binding(FSitMod.config::useServer, defaultConfig.useServer)
+                        binding(configBuilder::useServer, ModConfig.Default.useServer)
                         descriptionBuilder { addDefaultText() }
                     }
 
@@ -44,13 +43,13 @@ object FSitModMenu : ModMenuApi {
                         // todo: do i need to add some visuals?
                         val behaviour by options.registering {
                             controller = enumSwitch<Sitting.Behaviour>()
-                            binding(FSitMod.config.sitting::behaviour, defaultConfig.sitting.behaviour)
+                            binding(configBuilder::sittingBehaviour, ModConfig.Default.sitting.behaviour)
                             descriptionBuilder { addDefaultText() }
                         }
 
                         val shouldCenter by options.registering {
                             controller = tickBox()
-                            binding(FSitMod.config.sitting::shouldCenter, defaultConfig.sitting.shouldCenter)
+                            binding(configBuilder::sittingShouldCenter, ModConfig.Default.sitting.shouldCenter)
                             descriptionBuilder { addDefaultText() }
                         }
                     }
@@ -60,13 +59,21 @@ object FSitModMenu : ModMenuApi {
 
                         val sitMode by options.registering {
                             controller = enumSwitch<KeyBindingMode>()
-                            binding(KeyBindingMode.Hybrid, FSitModClient.sitMode::getValue, FSitModClient.sitMode::setValue)
+                            binding(
+                                KeyBindingMode.Hybrid,
+                                FSitModClient.sitMode::getValue,
+                                FSitModClient.sitMode::setValue,
+                            )
                             descriptionBuilder { addDefaultText() }
                         }
 
                         val crawlMode by options.registering {
                             controller = enumSwitch<KeyBindingMode>()
-                            binding(KeyBindingMode.Hybrid, FSitModClient.crawlMode::getValue, FSitModClient.crawlMode::setValue)
+                            binding(
+                                KeyBindingMode.Hybrid,
+                                FSitModClient.crawlMode::getValue,
+                                FSitModClient.crawlMode::setValue,
+                            )
                             descriptionBuilder { addDefaultText() }
                         }
                     }
@@ -75,26 +82,27 @@ object FSitModMenu : ModMenuApi {
                 val onUse by categories.registering {
                     val sitting by rootOptions.registering {
                         controller = tickBox()
-                        binding(FSitMod.config.onUse::sitting, defaultConfig.onUse.sitting)
+                        binding(configBuilder::onUseSitting, ModConfig.Default.onUse.sitting)
                         descriptionBuilder { addDefaultText() }
                     }
                     val riding by rootOptions.registering {
                         controller = tickBox()
-                        binding(FSitMod.config.onUse::riding, defaultConfig.onUse.riding)
+                        binding(configBuilder::onUseRiding, ModConfig.Default.onUse.riding)
                         descriptionBuilder { addDefaultText() }
                     }
                     val range by rootOptions.registering {
                         controller = slider(range = 1..4L)
-                        binding(FSitMod.config.onUse::range, defaultConfig.onUse.range)
+                        binding(configBuilder::onUseRange, ModConfig.Default.onUse.range)
                         descriptionBuilder { addDefaultText() }
                     }
                     val checkSuffocation by rootOptions.registering {
                         controller = tickBox()
-                        binding(FSitMod.config.onUse::checkSuffocation, defaultConfig.onUse.checkSuffocation)
+                        binding(configBuilder::onUseCheckSuffocation, ModConfig.Default.onUse.checkSuffocation)
                         descriptionBuilder { addDefaultText() }
                     }
 
-                    groups.register("blocks",
+                    groups.register(
+                        "blocks",
                         ListOption.createBuilder<RegistryIdentifier>()
                             .name("$categoryKey.root.option.blocks".translatable()).description(
                                 OptionDescription.createBuilder()
@@ -102,36 +110,41 @@ object FSitModMenu : ModMenuApi {
                             )
                             .description(OptionDescription.of("$categoryKey.root.option.blocks.description".translatable()))
                             .customController { RegistryController(it, Registries.BLOCK) }.binding(
-                                defaultConfig.onUse.blocks.toList(),
-                                FSitMod.config.onUse.blocks::toList,
-                            ) { FSitMod.config.onUse.blocks = it.toRegistrySet(Registries.BLOCK) }
+                                ModConfig.Default.onUse.blocks.toList(),
+                                configBuilder.onUseBlocks::toList,
+                            ) { configBuilder.onUseBlocks = it.toRegistrySet(Registries.BLOCK) }
                             .initial(RegistryIdentifier.defaultId).build())
                 }
 
                 val onSneak by categories.registering {
                     val sitting by rootOptions.registering {
                         controller = tickBox()
-                        binding(FSitMod.config.onSneak::sitting, defaultConfig.onSneak.sitting)
+                        binding(configBuilder::onSneakSitting, ModConfig.Default.onSneak.sitting)
                         descriptionBuilder { addDefaultText() }
                     }
                     val crawling by rootOptions.registering {
                         controller = tickBox()
-                        binding(FSitMod.config.onSneak::crawling, defaultConfig.onSneak.crawling)
+                        binding(configBuilder::onSneakCrawling, ModConfig.Default.onSneak.crawling)
                         descriptionBuilder { addDefaultText() }
                     }
                     val minPitch by rootOptions.registering {
                         controller = slider(range = -90.0..90.0)
-                        binding(FSitMod.config.onSneak::minPitch, defaultConfig.onSneak.minPitch)
+                        binding(configBuilder::onSneakMinPitch, ModConfig.Default.onSneak.minPitch)
                         descriptionBuilder { addDefaultText() }
                     }
                     val delay by rootOptions.registering {
                         controller = slider(range = 100..2000L)
-                        binding(FSitMod.config.onSneak::delay, defaultConfig.onSneak.delay)
+                        binding(configBuilder::onSneakDelay, ModConfig.Default.onSneak.delay)
                         descriptionBuilder { addDefaultText() }
                     }
                 }
 
-                save { modClientScope.launch { FSitModClient.saveConfig() } }
+                save {
+                    modClientScope.launch {
+                        FSitMod.writeConfig(configBuilder.build())
+                        FSitModClient.syncConfig()
+                    }
+                }
             }.generateScreen(screen)
         }
     }

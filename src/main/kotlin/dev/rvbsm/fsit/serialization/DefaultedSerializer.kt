@@ -1,4 +1,4 @@
-package dev.rvbsm.fsit.config.serialization
+package dev.rvbsm.fsit.serialization
 
 import dev.rvbsm.fsit.modLogger
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -12,12 +12,10 @@ class DefaultedSerializer<T>(
     private val defaultProvider: () -> T,
 ) : KSerializer<T> {
 
-    override val descriptor = tSerializer.descriptor
+    override val descriptor get() = tSerializer.descriptor
     private val default get() = defaultProvider()
 
-    override fun serialize(encoder: Encoder, value: T) {
-        tSerializer.serialize(encoder, value)
-    }
+    override fun serialize(encoder: Encoder, value: T) = tSerializer.serialize(encoder, value)
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun deserialize(decoder: Decoder) = runCatching {
