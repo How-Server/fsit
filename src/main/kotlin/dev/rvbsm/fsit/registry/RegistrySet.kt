@@ -18,7 +18,7 @@ interface RegistryCollection<E> : Collection<RegistryIdentifier> {
 class RegistrySet<E>(
     override val registry: DefaultedRegistry<E>,
     ids: Collection<RegistryIdentifier> = emptySet(),
-) : RegistryCollection<E>, Set<RegistryIdentifier> by ids.filterNotDefault().toSet() {
+) : RegistryCollection<E>, LinkedHashSet<RegistryIdentifier>(ids.filterNotDefault()) {
 
     override val entries = filterNot { it.isTag }.associateWith { registry[it.id] }
     override val tags = filter { it.isTag }.associateWith { TagKey.of(registry.key, it.id) }
