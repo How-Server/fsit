@@ -63,4 +63,5 @@ private fun World.willSuffocate(entity: Entity, pos: Vec3d): Boolean {
     }
 }
 
-fun RegistrySet<Block>.test(state: BlockState) = entries.any { state.isOf(it) } || tags.any { state.isIn(it) }
+private fun RegistrySet<Block>.test(state: BlockState) =
+    entries.any { (_, block) -> state.isOf(block) } || tags.any { (_, tag) -> state.isIn(tag) }
