@@ -1,5 +1,6 @@
 package dev.rvbsm.fsit.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.rvbsm.fsit.FSitMod;
 import dev.rvbsm.fsit.client.FSitModClient;
 import net.minecraft.client.gui.DrawContext;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
+import net.minecraft.client.network.SocialInteractionsManager;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -48,7 +50,7 @@ public abstract class SocialInteractionsPlayerListEntryMixin extends ElementList
     private ButtonWidget allowButton;
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", shift = At.Shift.AFTER, ordinal = 1))
-    protected void restrictButtons(CallbackInfo ci) {
+    protected void restrictButtons(CallbackInfo ci, @Local SocialInteractionsManager socialInteractionsManager) {
         if (FSitModClient.INSTANCE.isServerFSitCompatible()) {
             //? if <=1.20.1 {
             this.restrictButton = new TexturedButtonWidget(0, 0, 20, 20, 0, 0, 20, RESTRICT_TEXTURE, this::restrict);
@@ -58,10 +60,12 @@ public abstract class SocialInteractionsPlayerListEntryMixin extends ElementList
             this.allowButton = new TexturedButtonWidget(20, 20, ALLOW_TEXTURE, this::allow, ALLOW_BUTTON);
             *///?}
 
-            this.restrictButton.active = FSitMod.getConfig().getOnUse().getRiding();
+            final boolean isHidden = socialInteractionsManager.isPlayerHidden(uuid);
+
+            this.restrictButton.active = !isHidden && FSitMod.getConfig().getOnUse().getRiding();
             this.restrictButton.setTooltip(Tooltip.of(this.restrictButton.active ? RESTRICT_BUTTON : DISABLED_BUTTON));
 
-            this.allowButton.active = FSitMod.getConfig().getOnUse().getRiding();
+            this.allowButton.active = !isHidden && FSitMod.getConfig().getOnUse().getRiding();
             this.allowButton.setTooltip(Tooltip.of(this.allowButton.active ? ALLOW_BUTTON : DISABLED_BUTTON));
 
             buttons.add(this.restrictButton);
