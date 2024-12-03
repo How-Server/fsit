@@ -109,7 +109,11 @@ tasks {
         destinationDirectory = devLibsPath
 
         configurations = listOf(project.configurations["shadow"])
-        relocationPrefix = "dev.rvbsm.fsit.lib"
+        val relocationPath = "dev.rvbsm.fsit.lib"
+        relocate("com.charleskorn.kaml", "$relocationPath.kaml")
+        relocate("it.krzeminski.snakeyaml.engine.kmp", "$relocationPath.snakeyaml-kmp")
+        relocate("okio", "$relocationPath.okio")
+        relocate("net.thauvin.erik.urlencoder", "$relocationPath.urlencoder")
 
         exclude("kotlin/**")
         exclude("kotlinx/**")
