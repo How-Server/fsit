@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.7.0
+
+**The Garden Awakens** drop
+
+1.20.2–1.20.4 and 1.20.5–1.20.6 will no longer be published (still can be built manually)
+
+### Added
+
+- `sitting.apply_gravity` and `sitting.allow_in_air` migration
+
+### Fixed
+
+- Riding was not working in 1.21.2+
+- Wrong translation key in Mod Menu for `on_sneak.crawling`
+
 ## v2.6.2
 
 ### Fixed
@@ -167,7 +182,7 @@ Minecraft Tricky Trials Update
 
 ### Fixed
 
-- Riding didn't work
+- Riding did not work
 - “Allow” button on the Social Interactions screen didn't work
 - Incorrectly calculated seat velocity when yaw and movement direction differed
 - Some migrated configuration options were missing
