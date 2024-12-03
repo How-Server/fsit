@@ -27,7 +27,11 @@ val SpawnSeatListener = PassedUseBlockCallback interact@{ player, _, hitResult -
     if (!player.canSitOn(hitResult)) return@interact ActionResult.PASS
 
     player.setPose(ModPose.Sitting, hitResult.pos)
+
+    //? if <=1.21
     return@interact ActionResult.SUCCESS
+    //? if >=1.21.1
+    /*return@interact ActionResult.SUCCESS_SERVER*/
 }
 
 private fun ServerPlayerEntity.canSitOn(hitResult: BlockHitResult) =

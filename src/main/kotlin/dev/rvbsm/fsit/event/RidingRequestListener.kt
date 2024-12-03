@@ -34,7 +34,10 @@ internal val RidingRequestListener = PassedUseEntityCallback interact@{ player, 
         }
     }
 
+    //? if <=1.21
     return@interact ActionResult.SUCCESS
+    //? if >=1.21.1
+    /*return@interact ActionResult.SUCCESS_SERVER*/
 }
 
 private fun ServerPlayerEntity.shouldCancelRiding() = shouldCancelInteraction() || isSpectator || hasPassengers()
