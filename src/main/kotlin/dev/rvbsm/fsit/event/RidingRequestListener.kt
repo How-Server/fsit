@@ -5,7 +5,7 @@ import dev.rvbsm.fsit.entity.RideEntity
 import dev.rvbsm.fsit.modScope
 import dev.rvbsm.fsit.networking.config
 import dev.rvbsm.fsit.networking.payload.RidingRequestS2CPayload
-import dev.rvbsm.fsit.networking.sendRidingRequest
+import dev.rvbsm.fsit.networking.newRidingRequest
 import dev.rvbsm.fsit.networking.trySend
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.launch
@@ -21,9 +21,9 @@ internal val RidingRequestListener = PassedUseEntityCallback interact@{ player, 
     if (!player.config.onUse.riding || !entity.config.onUse.riding) return@interact ActionResult.PASS
     else if (!player.isInRange(entity, player.config.onUse.range.toDouble())) return@interact ActionResult.PASS
 
-    val playerResponse = player.sendRidingRequest(entity.uuid, requestTimeout)
+    val playerResponse = player.newRidingRequest(entity.uuid, requestTimeout)
     player.trySend(RidingRequestS2CPayload(entity.uuid)) { playerResponse.complete(true) }
-    val entityResponse = entity.sendRidingRequest(player.uuid, requestTimeout)
+    val entityResponse = entity.newRidingRequest(player.uuid, requestTimeout)
     entity.trySend(RidingRequestS2CPayload(player.uuid)) { entityResponse.complete(true) }
 
     modScope.launch {

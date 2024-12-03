@@ -18,7 +18,7 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
-internal fun <P> ServerPlayerEntity.trySend(payload: P, orAction: () -> Unit = {}) where P : CustomPayload<P> {
+internal fun <P> ServerPlayerEntity.trySend(payload: CustomPayload<P>, orAction: () -> Unit = {}) where P : CustomPayload<P> {
     if (ServerPlayNetworking.canSend(this, payload.id)) {
         ServerPlayNetworking.send(this, payload)
     } else orAction()
@@ -40,11 +40,11 @@ fun ServerPlayerEntity.hasConfig() = (this as PlayerConfig).`fsit$hasConfig`()
 
 val ServerPlayerEntity.realVelocity get() = (this as ServerPlayerVelocity).`fsit$getPlayerVelocity`()
 
-fun ServerPlayerEntity.sendRidingRequest(playerUUID: UUID, timeout: Duration) =
-    (networkHandler as RidingRequestHandler).`fsit$sendRidingRequest`(playerUUID, timeout.toJavaDuration())
+fun ServerPlayerEntity.newRidingRequest(playerUUID: UUID, timeout: Duration) =
+    (networkHandler as RidingRequestHandler).`fsit$newRidingRequest`(playerUUID, timeout.toJavaDuration())
 
-fun ServerPlayerEntity.onRidingResponse(response: RidingResponseC2SPayload) =
-    (networkHandler as RidingRequestHandler).`fsit$onRidingResponse`(response)
+fun ServerPlayerEntity.completeRidingRequest(response: RidingResponseC2SPayload) =
+    (networkHandler as RidingRequestHandler).`fsit$completeRidingRequest`(response)
 
 val ServerPlayerEntity.lastSneakTime: Long
     get() = (this as PlayerLastSneakTime).`fsit$getLastSneakTime`()

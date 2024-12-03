@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface RidingRequestHandler {
 
-    @NotNull CompletableFuture<Boolean> fsit$sendRidingRequest(@NotNull UUID playerUUID, @NotNull Duration duration);
+    @NotNull CompletableFuture<Boolean> fsit$newRidingRequest(@NotNull UUID playerUUID, @NotNull Duration duration);
 
-    void fsit$onRidingResponse(@NotNull RidingResponseC2SPayload response);
+    void fsit$completeRidingRequest(@NotNull RidingResponseC2SPayload response);
 }

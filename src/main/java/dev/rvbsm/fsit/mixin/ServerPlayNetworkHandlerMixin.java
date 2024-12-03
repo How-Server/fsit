@@ -77,7 +77,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> fsit$sendRidingRequest(@NotNull UUID playerUUID, @NotNull Duration timeout) {
+    public @NotNull CompletableFuture<Boolean> fsit$newRidingRequest(@NotNull UUID playerUUID, @NotNull Duration timeout) {
         final CompletableFuture<Boolean> pendingFuture = this.pendingRidingRequests.get(playerUUID);
         if (pendingFuture != null && !pendingFuture.isDone()) {
             return CompletableFuture.completedFuture(false);
@@ -91,7 +91,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
     }
 
     @Override
-    public void fsit$onRidingResponse(@NotNull RidingResponseC2SPayload response) {
+    public void fsit$completeRidingRequest(@NotNull RidingResponseC2SPayload response) {
         final CompletableFuture<Boolean> future = this.pendingRidingRequests.remove(response.getUuid());
         if (future != null && !future.isDone()) {
             future.complete(response.getResponse().isAccepted());

@@ -26,7 +26,7 @@ internal val RidingResponseC2SHandler = ServerPayloadHandler<RidingResponseC2SPa
         player.removeAllPassengers()
     }
 
-    player.onRidingResponse(this)
+    player.completeRidingRequest(this)
 }
 
 private typealias PlayPayloadHandler<P> =
