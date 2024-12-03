@@ -1,6 +1,7 @@
 package dev.rvbsm.fsit.serialization
 
 import com.charleskorn.kaml.AmbiguousQuoteStyle
+import com.charleskorn.kaml.AnchorsAndAliases
 import com.charleskorn.kaml.MultiLineStringStyle
 import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.SequenceStyle
@@ -89,9 +90,9 @@ class YamlBuilder(yaml: Yaml) {
             configuration = configuration.copy(sequenceBlockIndent = value)
             field = value
         }
-    var allowAnchorsAndAliases: Boolean = false
+    var anchorsAndAliases: AnchorsAndAliases = AnchorsAndAliases.Forbidden
         set(value) {
-            configuration = configuration.copy(allowAnchorsAndAliases = value)
+            configuration = configuration.copy(anchorsAndAliases = value)
             field = value
         }
     var yamlNamingStrategy: YamlNamingStrategy? = null
