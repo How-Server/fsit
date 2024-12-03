@@ -14,7 +14,6 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -59,13 +58,6 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
         }
     }
 
-    @Inject(method = "onDisconnected", at = @At("TAIL"))
-    public void purgePendingRequests(Text reason, CallbackInfo ci) {
-        for (UUID uuid : this.pendingRidingRequests.keySet()) {
-            this.pendingRidingRequests.remove(uuid).complete(false);
-        }
-    }
-
     @ModifyVariable(method = "onPlayerInteractBlock", at = @At("STORE"))
     private ActionResult interactBlock(ActionResult interactionActionResult, @Local ServerWorld world, @Local LocalRef<Hand> handRef, @Local BlockHitResult blockHitResult) {
         if (interactionActionResult == ActionResult.PASS && handRef.get() == Hand.OFF_HAND && player.getStackInHand(handRef.get()).getUseAction().ordinal() == 0) {
@@ -75,6 +67,13 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
         }
 
         return interactionActionResult;
+    }
+
+    @Inject(method = "onDisconnected", at = @At("TAIL"))
+    public void purgePendingRequests(CallbackInfo ci) {
+        for (UUID uuid : this.pendingRidingRequests.keySet()) {
+            this.pendingRidingRequests.remove(uuid).complete(false);
+        }
     }
 
     @Override
