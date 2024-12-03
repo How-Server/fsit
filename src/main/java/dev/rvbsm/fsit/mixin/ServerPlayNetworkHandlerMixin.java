@@ -79,13 +79,16 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
 
     @Override
     public @NotNull CompletableFuture<Boolean> fsit$sendRidingRequest(@NotNull UUID playerUUID, @NotNull Duration timeout) {
-        return this.pendingRidingRequests.compute(playerUUID, (uuid, future) -> {
-            if (future != null && !future.isDone()) {
-                return CompletableFuture.completedFuture(false);
-            }
+        final CompletableFuture<Boolean> pendingFuture = this.pendingRidingRequests.get(playerUUID);
+        if (pendingFuture != null && !pendingFuture.isDone()) {
+            return CompletableFuture.completedFuture(false);
+        }
 
-            return new CompletableFuture<Boolean>().completeOnTimeout(false, timeout.toMillis(), TimeUnit.MILLISECONDS);
-        });
+        final CompletableFuture<Boolean> ridingResponse =
+                new CompletableFuture<Boolean>().completeOnTimeout(false, timeout.toMillis(), TimeUnit.MILLISECONDS);
+        this.pendingRidingRequests.put(playerUUID, ridingResponse);
+
+        return ridingResponse;
     }
 
     @Override
