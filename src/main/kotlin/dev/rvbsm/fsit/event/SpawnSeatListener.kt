@@ -28,9 +28,9 @@ val SpawnSeatListener = PassedUseBlockCallback interact@{ player, _, hitResult -
 
     player.setPose(ModPose.Sitting, hitResult.pos)
 
-    //? if <=1.21
+    //? if <=1.21.1
     return@interact ActionResult.SUCCESS
-    //? if >=1.21.1
+    //? if >=1.21.2
     /*return@interact ActionResult.SUCCESS_SERVER*/
 }
 
