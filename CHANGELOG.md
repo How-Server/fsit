@@ -10,6 +10,10 @@
 
 - `sitting.apply_gravity` and `sitting.allow_in_air` migration
 
+### Changed
+
+- Check vision blocking when `on_use.check_suffocation` is `true`
+
 ### Fixed
 
 - Riding was not working in 1.21.2+
