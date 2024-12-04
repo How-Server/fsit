@@ -123,4 +123,4 @@ data class OnSneak(
     val delay: Long = 600,
 )
 
-fun Result<ModConfig>.getOrDefault() = getOrDefault(ModConfig())
+fun Result<ModConfig>.orDefault() = getOrDefault(ModConfig.Default)

@@ -1,7 +1,7 @@
 package dev.rvbsm.fsit.networking.payload
 
 import dev.rvbsm.fsit.config.ModConfig
-import dev.rvbsm.fsit.config.getOrDefault
+import dev.rvbsm.fsit.config.orDefault
 import dev.rvbsm.fsit.serialization.decode
 import dev.rvbsm.fsit.serialization.encode
 import dev.rvbsm.fsit.jsonSerializer
@@ -13,7 +13,7 @@ data class ConfigUpdateC2SPayload(val serializedConfig: String) : CustomPayload<
         buf.writeString(serializedConfig)
     }
 
-    suspend fun decode() = jsonSerializer.decode<ModConfig>(serializedConfig).getOrDefault()
+    suspend fun decode() = jsonSerializer.decode<ModConfig>(serializedConfig).orDefault()
 
     companion object : Id<ConfigUpdateC2SPayload>("config_sync", NetworkSide.SERVERBOUND) {
         override fun init(buf: PacketByteBuf) = ConfigUpdateC2SPayload(buf.readString())

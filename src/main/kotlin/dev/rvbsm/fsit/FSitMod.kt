@@ -11,7 +11,7 @@ import dev.rvbsm.fsit.command.command
 import dev.rvbsm.fsit.command.isGameMaster
 import dev.rvbsm.fsit.config.ModConfig
 import dev.rvbsm.fsit.config.configSchemas
-import dev.rvbsm.fsit.config.getOrDefault
+import dev.rvbsm.fsit.config.orDefault
 import dev.rvbsm.fsit.entity.ModPose
 import dev.rvbsm.fsit.event.RidingRequestListener
 import dev.rvbsm.fsit.event.SneakListener
@@ -105,7 +105,7 @@ object FSitMod : ModInitializer {
     fun translatable(category: String, path: String, vararg args: Any) = "$category.$MOD_ID.$path".translatable(args)
 
     override fun onInitialize() = runBlocking {
-        config = configReader.read().getOrDefault()
+        config = configReader.read().orDefault()
 
         registerPayloads()
         registerEvents()
@@ -134,7 +134,7 @@ object FSitMod : ModInitializer {
             requires(ServerCommandSource::isGameMaster)
 
             literal("reload") executesSuspend {
-                config = configReader.read().getOrDefault()
+                config = configReader.read().orDefault()
                 source.sendFeedback("Reloaded config!"::literal, true)
             }
 
