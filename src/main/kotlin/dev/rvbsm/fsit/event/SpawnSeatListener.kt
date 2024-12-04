@@ -36,7 +36,7 @@ val SpawnSeatListener = PassedUseBlockCallback interact@{ player, _, hitResult -
 
 private fun ServerPlayerEntity.canSitOn(hitResult: BlockHitResult) =
     if (!pos.isInRange(hitResult.pos, config.onUse.range.toDouble())) false
-    else if (config.onUse.checkSuffocation && world.willSuffocate(this, hitResult.pos)) false
+    else if (config.onUse.checkSuffocation && world.willBlockVision(this, hitResult.pos)) false
     else world.getBlockState(hitResult.blockPos).let { hitState ->
         hitState.isSittableSide() && config.onUse.blocks.test(hitState)
     }
@@ -50,16 +50,15 @@ private fun BlockState.isSittableSide() = when {
 }
 
 /** adapted from [net.minecraft.entity.Entity.isInsideWall] */
-private fun World.willSuffocate(entity: Entity, pos: Vec3d): Boolean {
-    val box = Box.of(
-        pos.add(0.0, entity.standingEyeHeight.toDouble() - 0.5, 0.0),
-        entity.width.toDouble(), 1.0e-6, entity.width.toDouble(),
-    )
+private fun World.willBlockVision(entity: Entity, pos: Vec3d): Boolean {
+    val eyePos = pos.add(0.0, entity.standingEyeHeight - 0.5, 0.0)
+    val width = entity.width * 0.8
+    val box = Box.of(eyePos, width, 1.0e-6, width)
 
-    return BlockPos.stream(box).anyMatch isInsideBlock@{
+    return BlockPos.stream(box).anyMatch {
         val blockState = getBlockState(it)
 
-        !blockState.isAir && blockState.shouldSuffocate(this, it) && VoxelShapes.matchesAnywhere(
+        !blockState.isAir && blockState.shouldBlockVision(this, it) && VoxelShapes.matchesAnywhere(
             blockState.getCollisionShape(this, it).offset(it.x.toDouble(), it.y.toDouble(), it.z.toDouble()),
             VoxelShapes.cuboid(box),
             BooleanBiFunction.AND,
