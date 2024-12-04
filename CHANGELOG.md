@@ -13,6 +13,8 @@
 ### Changed
 
 - Check vision blocking when `on_use.check_suffocation` is `true`
+- Restriction buttons are disabled if player is hidden
+- Riding request will be refused if player is hidden/blocked in Minecraft's Social Interactions
 
 ### Fixed
 
