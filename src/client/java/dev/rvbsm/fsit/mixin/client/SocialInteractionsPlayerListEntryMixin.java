@@ -87,6 +87,12 @@ public abstract class SocialInteractionsPlayerListEntryMixin extends ElementList
         }
     }
 
+    @Inject(method = "setShowButtonVisible", at = @At("TAIL"))
+    private void setRestrictionButtonVisible(boolean showButtonVisible, CallbackInfo ci) {
+        this.restrictButton.active = !showButtonVisible;
+        this.allowButton.active = !showButtonVisible;
+    }
+
     @Unique
     private void updateButtons(boolean isRestricted) {
         this.restrictButton.visible = !isRestricted;
