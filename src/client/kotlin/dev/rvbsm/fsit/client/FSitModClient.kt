@@ -34,12 +34,21 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.command.argument.GameProfileArgumentType
 import net.minecraft.text.Text
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.UUID
 
 private typealias RestrictionSet = MutableSet<UUID>
 
-internal lateinit var modClientScope: CoroutineScope
-    private set
+internal lateinit var minecraftClient: MinecraftClient
+
+@PublishedApi
+internal val modClientScope: CoroutineScope by lazy {
+    CoroutineScope(minecraftClient.asCoroutineDispatcher() + SupervisorJob())
+}
+
+@PublishedApi
+internal val modClientLogger: Logger = LoggerFactory.getLogger(FSitModClient::class.java)
 
 private val alreadyRestrictedException =
     SimpleCommandExceptionType("Nothing changed. The player is already restricted".literal())
@@ -70,7 +79,7 @@ object FSitModClient : ClientModInitializer {
 
     @JvmStatic
     fun restrictInteractionsFor(uuid: UUID) = socialRestrictions.store(uuid).also removeRestrictedPassenger@{
-        val player = MinecraftClient.getInstance().player ?: return@removeRestrictedPassenger
+        val player = minecraftClient.player ?: return@removeRestrictedPassenger
         if (player.hasPassenger { it.uuid == uuid }) {
             trySend(RidingResponseC2SPayload(uuid, false)) // todo: is there any vanilla way?
         }
@@ -105,9 +114,7 @@ object FSitModClient : ClientModInitializer {
     }
 
     private fun registerClientEvents() {
-        ClientLifecycleEvents.CLIENT_STARTED.register {
-            modClientScope = CoroutineScope(it.asCoroutineDispatcher() + SupervisorJob())
-        }
+        ClientLifecycleEvents.CLIENT_STARTED.register { minecraftClient = it }
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             modClientScope.launch { syncConfig() }

@@ -49,16 +49,20 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.command.ServerCommandSource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-@PublishedApi
-internal val modLogger: Logger = LoggerFactory.getLogger(FSitMod::class.java)
+internal lateinit var minecraftServer: MinecraftServer
 
 @PublishedApi
-internal lateinit var modScope: CoroutineScope
-    private set
+internal val modScope: CoroutineScope by lazy {
+    CoroutineScope(minecraftServer.asCoroutineDispatcher() + SupervisorJob())
+}
+
+@PublishedApi
+internal val modLogger: Logger = LoggerFactory.getLogger(FSitMod::class.java)
 
 @OptIn(ExperimentalSerializationApi::class)
 @Suppress("json_format_redundant")
@@ -119,9 +123,7 @@ object FSitMod : ModInitializer {
     }
 
     private fun registerEvents() {
-        ServerLifecycleEvents.SERVER_STARTING.register {
-            modScope = CoroutineScope(it.asCoroutineDispatcher() + SupervisorJob())
-        }
+        ServerLifecycleEvents.SERVER_STARTING.register { minecraftServer = it }
 
         PassedUseEntityCallback.EVENT.register(RidingRequestListener)
         PassedUseBlockCallback.EVENT.register(SpawnSeatListener)
