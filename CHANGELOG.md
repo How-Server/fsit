@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.7.1
+
+### Fixed
+
+- Crash on client disconnection
+
 ## v2.7.0
 
 **The Garden Awakens** drop
