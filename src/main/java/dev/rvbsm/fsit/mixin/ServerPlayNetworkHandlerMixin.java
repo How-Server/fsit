@@ -71,9 +71,8 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
 
     @Inject(method = "onDisconnected", at = @At("TAIL"))
     public void purgePendingRequests(CallbackInfo ci) {
-        for (UUID uuid : this.pendingRidingRequests.keySet()) {
-            this.pendingRidingRequests.remove(uuid).complete(false);
-        }
+        this.pendingRidingRequests.forEach((uuid, future) -> future.complete(false));
+        this.pendingRidingRequests.clear();
     }
 
     @Override
@@ -83,8 +82,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements RidingRequestHand
             return CompletableFuture.completedFuture(false);
         }
 
-        final CompletableFuture<Boolean> ridingResponse =
-                new CompletableFuture<Boolean>().completeOnTimeout(false, timeout.toMillis(), TimeUnit.MILLISECONDS);
+        final CompletableFuture<Boolean> ridingResponse = new CompletableFuture<Boolean>().completeOnTimeout(false, timeout.toMillis(), TimeUnit.MILLISECONDS);
         this.pendingRidingRequests.put(playerUUID, ridingResponse);
 
         return ridingResponse;
