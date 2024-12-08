@@ -17,11 +17,15 @@ interface RegistryCollection<E> : Collection<RegistryIdentifier> {
 
 class RegistrySet<E>(
     override val registry: DefaultedRegistry<E>,
-    ids: Collection<RegistryIdentifier> = emptySet(),
-) : RegistryCollection<E>, LinkedHashSet<RegistryIdentifier>(ids.filterNotDefault()) {
+    private val ids: Set<RegistryIdentifier> = emptySet(),
+) : RegistryCollection<E>, Set<RegistryIdentifier> by ids {
 
     override val entries = filterNot { it.isTag }.associateWith { registry[it.id] }
     override val tags = filter { it.isTag }.associateWith { TagKey.of(registry.key, it.id) }
+
+    override fun toString(): String = ids.toString()
+    override fun equals(other: Any?): Boolean = ids == other
+    override fun hashCode(): Int = ids.hashCode()
 
     operator fun plus(other: RegistrySet<E>) = RegistrySet(registry, (this as Set<RegistryIdentifier>) + other)
 
@@ -35,10 +39,10 @@ class RegistrySet<E>(
 }
 
 fun <E> registrySetOf(registry: DefaultedRegistry<E>, vararg entries: E) =
-    RegistrySet(registry, entries.map { RegistryIdentifier(registry.getId(it), isTag = false) })
+    RegistrySet(registry, entries.map { RegistryIdentifier(registry.getId(it), isTag = false) }.toSet())
 
 fun <E> registrySetOf(registry: DefaultedRegistry<E>, vararg tags: TagKey<E>) =
-    RegistrySet(registry, tags.map { RegistryIdentifier(it.id, isTag = true) })
+    RegistrySet(registry, tags.map { RegistryIdentifier(it.id, isTag = true) }.toSet())
 
 fun registrySetOf(vararg blocks: Block) = registrySetOf(Registries.BLOCK, *blocks)
 fun registrySetOf(vararg tags: TagKey<Block>) = registrySetOf(Registries.BLOCK, *tags)
