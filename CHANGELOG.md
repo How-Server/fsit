@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.7.2
+
+### Fixed
+
+- The configuration file was not created if it did not exist. Thanks [#48](https://github.com/rvbsm/fsit/issues/48)
+- Sneaks (to sit) were registered in vehicles or when flying
+
 ## v2.7.1
 
 ### Fixed
