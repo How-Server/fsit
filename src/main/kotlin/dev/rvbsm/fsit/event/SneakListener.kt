@@ -13,7 +13,8 @@ import net.minecraft.util.Util
 
 val SneakListener = ClientCommandCallback { player, mode ->
     if (mode == ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY) {
-        if (!player.config.onSneak.sitting && !player.config.onSneak.crawling) return@ClientCommandCallback
+        if (player.hasVehicle() || player.abilities.flying) return@ClientCommandCallback
+        else if (!player.config.onSneak.sitting && !player.config.onSneak.crawling) return@ClientCommandCallback
         else if (player.pitch < player.config.onSneak.minPitch) return@ClientCommandCallback
 
         if (Util.getMeasuringTimeMs() - player.lastSneakTime <= player.config.onSneak.delay) when {
