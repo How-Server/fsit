@@ -21,7 +21,7 @@ fun getDismountPosition(vehicle: Entity, passenger: LivingEntity): Vec3d {
     for ((xOffset, zOffset) in sequenceOf(intArrayOf(0, 0), *dismountOffsets)) {
         val dismountPos = vehiclePos.add(xOffset.toDouble(), 0.0, zOffset.toDouble()).let { dismountPos ->
             world.getDismountHeight(BlockPos.ofFloored(dismountPos)).takeIf(::canDismountInBlock)
-                ?.let { dismountHeight -> dismountPos.add(0.0, dismountHeight, 0.0) }
+                ?.let { dismountHeight -> dismountPos.add(0.0, dismountHeight + 0.2, 0.0) }
         } ?: continue
 
         passenger.poses.find { canPlaceEntityAt(world, dismountPos, passenger, it) }?.let {
