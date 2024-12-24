@@ -90,7 +90,8 @@ object FSitMod : ModInitializer {
     const val MOD_ID = "fsit"
 
     private val configReader = yamlSerializer.asReader<Yaml, ModConfig>(
-        FabricLoader.getInstance().configDir, MOD_ID, "yml", "yaml", writeToFile = true
+        FabricLoader.getInstance().configDir, MOD_ID, listOf("yml", "yaml"), writeToFile = true,
+        ModConfig::Default,
     )
 
     @JvmStatic

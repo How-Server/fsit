@@ -56,7 +56,8 @@ private val alreadyAllowedException =
     SimpleCommandExceptionType("Nothing changed. The player isn't restricted".literal())
 
 private val restrictionsReader = jsonSerializer.asReader<Json, RestrictionSet>(
-    FabricLoader.getInstance().configDir, "$MOD_ID.restrictions", "json", writeToFile = true
+    FabricLoader.getInstance().configDir, "$MOD_ID.restrictions", "json", writeToFile = true,
+    ::mutableSetOf,
 )
 
 object FSitModClient : ClientModInitializer {
